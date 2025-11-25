@@ -67,12 +67,13 @@ function populateAttrValues() {
   var queryString = window.location.search;
   var urlParams = new URLSearchParams(queryString);
 
-  value.ses[0].attr.src = urlParams.get("utm_source");
-  value.ses[0].attr.med = urlParams.get("utm_medium");
-  value.ses[0].attr.cmp = urlParams.get("utm_campaign");
-  value.ses[0].attr.trm = urlParams.get("utm_term");
-  value.ses[0].attr.kwd = urlParams.get("utm_keyword");
-  value.ses[0].attr.cnt = urlParams.get("utm_content");
+  value.ses[0].attr.src = value.ses[0].attr.src || urlParams.get("utm_source");
+  value.ses[0].attr.med = value.ses[0].attr.med || urlParams.get("utm_medium");
+  value.ses[0].attr.cmp =
+    value.ses[0].attr.cmp || urlParams.get("utm_campaign");
+  value.ses[0].attr.trm = value.ses[0].attr.trm || urlParams.get("utm_term");
+  value.ses[0].attr.kwd = value.ses[0].attr.kwd || urlParams.get("utm_keyword");
+  value.ses[0].attr.cnt = value.ses[0].attr.cnt || urlParams.get("utm_content");
 
   Cookies.set("_fpa_data", JSON.stringify(value), { expires: 365, path: "/" });
 }
