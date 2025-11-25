@@ -66,6 +66,10 @@ function populateFPADataValues() {
   value.lact = Date.now();
 
   // TODO: Populate GA Client ID (If it's null keep as is)
+  console.log(
+    "_ga cookie value",
+    Cookies.get("_ga", { domain: ".awardco.com" })
+  );
   value.ga_cid =
     JSON.parse(Cookies.get("_ga", { domain: ".awardco.com" })) || value.ga_cid;
   console.log("ga_cid", value.ga_cid);
@@ -113,4 +117,4 @@ initFpaDataCookie();
 populateFPADataValues();
 populateAttrValues();
 
-console.log("Dev Version: 1.0.3");
+console.log("Dev Version: 1.0.4");
