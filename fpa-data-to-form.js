@@ -14,6 +14,6 @@ Webflow.push(function () {
   };
 
   Object.keys(UTMs).forEach((key) => {
-    $(`[hs-form-field]="${key}"]`).val(UTMs[key]);
+    $(`[hs-form-field="${key}"]`).val(UTMs[key]);
   });
 });
