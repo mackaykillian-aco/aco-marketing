@@ -60,8 +60,9 @@ if (!Cookies.get("_fpa_data")) {
   Cookies.set("_fpa_data", value, { expires: 365, path: "/" });
 } else {
   var cc = Cookies.get("_fpa_data");
-  console.log("currentCookie", cc);
   cc = JSON.parse(cc);
   cc.lvs = Date.now();
   Cookies.set("_fpa_data", JSON.stringify(cc));
 }
+
+console.log("GitHub Repo Change Test");
