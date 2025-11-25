@@ -1,3 +1,5 @@
+console.log("Dev Version: 1.0.5");
+
 var fpaDataTemplate = {
   cid: "",
   fact: 0, // first activity
@@ -116,5 +118,3 @@ function populateAttrValues() {
 initFpaDataCookie();
 populateFPADataValues();
 populateAttrValues();
-
-console.log("Dev Version: 1.0.4");
