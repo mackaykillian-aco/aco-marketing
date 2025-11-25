@@ -52,8 +52,8 @@ function initFpaDataCookie() {
   if (!Cookies.get("_fpa_data")) {
     var value = structuredClone(fpaDataTemplate);
     value.cid = crypto.randomUUID();
-    value.vts = Date.now();
-    value.lvs = Date.now();
+    value.fact = Date.now();
+    value.lact = Date.now();
 
     var value = JSON.stringify(value);
     Cookies.set("_fpa_data", value, { expires: 365, path: "/" });
