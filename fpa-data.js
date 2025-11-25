@@ -48,16 +48,39 @@ var fpaDataTemplate = {
 
 // Init FPA DATA Cookie
 function initFpaDataCookie() {
-  // Check if _fpa_data cookie exists
   if (!Cookies.get("_fpa_data")) {
-    var value = structuredClone(fpaDataTemplate);
     value.cid = crypto.randomUUID();
     value.fact = Date.now();
-    value.lact = Date.now();
-
-    var value = JSON.stringify(value);
-    Cookies.set("_fpa_data", value, { expires: 365, path: "/" });
+    Cookies.set("_fpa_data", JSON.stringify(value), {
+      expires: 183,
+      path: "/",
+    });
   }
+}
+
+function populateFPADataValues() {
+  var value = JSON.parse(Cookies.get("_fpa_data"));
+
+  // Update last activity timestamp
+  value.lact = Date.now();
+
+  // TODO: Populate GA Client ID (If it's null keep as is)
+  value.ga_cid =
+    JSON.parse(Cookies.get("_ga", { domain: ".awardco.com" })) || value.ga_cid;
+  console.log("ga_cid", value.ga_cid);
+
+  // TODO: Populate HSU ID (If doesn't match, replace)
+  // value.hsu_id =
+
+  // TODO: Populate Wf Attribute
+
+  // TODO: If last session is 24+ hours old, create new session object and push to ses array.
+  // if ses is more than 5 items long, remove the oldest session object.
+
+  Cookies.set("_fpa_data", JSON.stringify(value), {
+    expires: 183,
+    path: "/",
+  });
 }
 
 // 1. Populate ATTR Values
@@ -86,6 +109,7 @@ function populateAttrValues() {
 
 // Execute Functions
 initFpaDataCookie();
+populateFPADataValues();
 populateAttrValues();
 
-console.log("Dev Version: 1.0.2");
+console.log("Dev Version: 1.0.3");
