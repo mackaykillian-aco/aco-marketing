@@ -67,7 +67,9 @@ function populateAttrValues() {
   var queryString = window.location.search;
   var urlParams = new URLSearchParams(queryString);
 
+  console.log("attr.src 1", value.ses[0].attr.src);
   value.ses[0].attr.src = value.ses[0].attr.src || urlParams.get("utm_source");
+  console.log("attr.src 2", value.ses[0].attr.src);
   value.ses[0].attr.med = value.ses[0].attr.med || urlParams.get("utm_medium");
   value.ses[0].attr.cmp =
     value.ses[0].attr.cmp || urlParams.get("utm_campaign");
@@ -85,3 +87,5 @@ function populateAttrValues() {
 // Execute Functions
 initFpaDataCookie();
 populateAttrValues();
+
+console.log("Dev Version: 1.0.2");
