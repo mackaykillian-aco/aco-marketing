@@ -1,4 +1,4 @@
-console.log("FPA V1.2.4");
+console.log("FPA V1.2.5");
 
 const DEBUG = true;
 function debugLog(message) {
@@ -22,7 +22,7 @@ var fpaDataTemplate = {
       sid: "", // Session ID
       pgc: 0, // Page count
       sst: 0, // Session start time
-      tsos: 0, // Time spent on site
+      tsos: "", // Time spent on site
       ldp: "", // Landing page (session entry point)
       cpv: "", // Current Page View (can be used for Conversion page on form submit)
       ref: "", // Referring URL
@@ -59,6 +59,14 @@ var fpaDataTemplate = {
     },
   ],
 };
+
+function millisToMinutesAndSeconds(millis) {
+  var minutes = Math.floor(millis / 60000);
+  var seconds = ((millis % 60000) / 1000).toFixed(0);
+  return seconds == 60
+    ? minutes + 1 + ":00"
+    : minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+}
 
 /*** INITIALIZE COOKIE ***/
 function initFpaDataCookie() {
@@ -125,7 +133,9 @@ function updateSessionLevelData() {
 
   window.fpaData.ses[0].cpv = window.location.pathname;
   window.fpaData.ses[0].pgc += 1;
-  window.fpaData.ses[0].tsos = Date.now() - window.fpaData.ses[0].sst; // We could only store the sst and subtract it from Date.now() when form submits
+  window.fpaData.ses[0].tsos = millisToMinutesAndSeconds(
+    Date.now() - window.fpaData.ses[0].sst
+  ); // We could only store the sst and subtract it from Date.now() when form submits
   debugLog("updateSessionLevelData() ->");
 }
 
