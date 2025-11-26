@@ -1,4 +1,4 @@
-console.log("FPA V1.2.3");
+console.log("FPA V1.2.4");
 
 const DEBUG = true;
 function debugLog(message) {
@@ -35,6 +35,7 @@ var fpaDataTemplate = {
         cnt: "", // UTM Content
       },
       ads: {
+        // TODO: Adjust Names to match the URL Paramter Name
         gcl_id: "", // GCLID (Google Ads)
         dcl_id: "", // DCLID (Doubleclick Ads)
         msft_id: "", // Microsoft Ads ID
@@ -150,6 +151,27 @@ function populateAttrValues() {
   debugLog("populateAttrValues() ->");
 }
 
+// 2.2 Populate ADS Values
+function populateAdsValues() {
+  debugLog("-> populateAdsValues()");
+  var queryString = window.location.search;
+  var urlParams = new URLSearchParams(queryString);
+
+  // TODO: Adjust Names to match the URL Paramter Name (Once Confirmed)
+  window.fpaData.ses[0].ads.gcl_id =
+    window.fpaData.ses[0].ads.gcl_id || urlParams.get("gclid");
+  window.fpaData.ses[0].ads.dcl_id =
+    window.fpaData.ses[0].ads.dcl_id || urlParams.get("dclid");
+  window.fpaData.ses[0].ads.msft_id =
+    window.fpaData.ses[0].ads.msft_id || urlParams.get("msclkid");
+  window.fpaData.ses[0].ads.lnkd_id =
+    window.fpaData.ses[0].ads.lnkd_id || urlParams.get("linkd"); // TODO: Confirm with Paul all Param Names
+  window.fpaData.ses[0].ads.meta_id =
+    window.fpaData.ses[0].ads.meta_id || urlParams.get("fbclid");
+
+  debugLog("populateAdsValues() ->");
+}
+
 // 3. Update PAGEVIEW Level Data
 
 // 3.1 Populate EXPT Values
@@ -158,6 +180,7 @@ function populateAttrValues() {
 updateUserLevelData();
 updateSessionLevelData();
 populateAttrValues();
+populateAdsValues();
 
 /*** WRITE COOKIE ***/
 window.addEventListener("beforeunload", function () {
