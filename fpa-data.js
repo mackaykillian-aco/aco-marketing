@@ -1,4 +1,4 @@
-console.log("FPA V1.2.7");
+console.log("FPA V1.2.8");
 
 const DEBUG = true;
 function debugLog(message) {
@@ -8,6 +8,8 @@ function debugLog(message) {
 }
 
 const DOMAIN = "awardco-stg.webflow.io";
+const MAX_SESSIONS = 5;
+const MAX_PAGEVIEWS = 20;
 
 /*** DEFINE MODEL ***/
 var fpaDataTemplate = {
@@ -47,6 +49,7 @@ var fpaDataTemplate = {
           path: "", // Page path
           ttl: "", // Page title
           top: "", // Time on page
+          pvst: 0, // Pageview start time
           expt: {
             eid: "", // Webflow Optimize Experiment ID
             ena: "", // Webflow Optimize Experiment Name
@@ -114,6 +117,11 @@ function updateUserLevelData() {
     if (sessionExpired) {
       window.fpaData.ses.unshift(structuredClone(fpaDataTemplate.ses[0]));
       console.log("new session started");
+    }
+
+    if (window.fpaData.ses.length > MAX_SESSIONS) {
+      window.fpaData.ses.length = MAX_SESSIONS;
+      debugLog("old sessions removed to maintain max sessions");
     }
   }
 
@@ -183,6 +191,33 @@ function populateAdsValues() {
 }
 
 // 3. Update PAGEVIEW Level Data
+function updatePageviewData() {
+  debugLog("-> updatePageviewData()");
+  // Add new pageview object to pvs array
+  let newPageview = structuredClone(fpaDataTemplate.ses[0].pvs[0]);
+  newPageview.path = window.location.pathname;
+  newPageview.ttl = document.title;
+  newPageview.pvst = Date.now();
+
+  // Add Experiment Data if available
+  var wf = Webflow || [];
+  wf.ready(function () {
+    wf.onVariationRecorded(function (result) {
+      newPageview.expt.eid = result.experienceId || ""; // Webflow Optimize Experiment ID
+      newPageview.expt.ena = result.experienceName || ""; // Webflow Optimize Experiment Name
+      newPageview.expt.etp = result.experienceType || ""; // Webflow Optimize Experiment Type
+      newPageview.expt.vid = result.variationId || ""; // Webflow Optimize Variant ID
+      newPageview.expt.vna = result.variationName || ""; // Webflow Optimize Variant Name
+    });
+  });
+
+  window.fpaData.ses[0].pvs.unshift(newPageview);
+  // If pvs is more than 20 items long, remove the oldest pageview object.
+  if (window.fpaData.ses[0].pvs.length > MAX_PAGEVIEWS) {
+    window.fpaData.ses[0].pvs.length = MAX_PAGEVIEWS;
+    debugLog("old pageviews removed to maintain max pageviews");
+  }
+}
 
 // 3.1 Populate EXPT Values
 
@@ -194,6 +229,8 @@ populateAdsValues();
 
 /*** WRITE COOKIE ***/
 window.addEventListener("beforeunload", function () {
+  // TODO: Time on Session, Time on Pageiew, and Last activity Record here
+
   // Write cookie on page unload
   Cookies.set("_fpa_data", JSON.stringify(window.fpaData), {
     expires: 183,
