@@ -1,4 +1,4 @@
-console.log("FPA V1.2.9");
+console.log("FPA V1.2.10");
 
 const DEBUG = true;
 function debugLog(message) {
@@ -200,16 +200,17 @@ function updatePageviewData() {
   newPageview.pvst = Date.now();
 
   // Add Experiment Data if available
-  var wf = Webflow || [];
-  wf.ready(function () {
-    wf.onVariationRecorded(function (result) {
-      newPageview.expt.eid = result.experienceId || ""; // Webflow Optimize Experiment ID
-      newPageview.expt.ena = result.experienceName || ""; // Webflow Optimize Experiment Name
-      newPageview.expt.etp = result.experienceType || ""; // Webflow Optimize Experiment Type
-      newPageview.expt.vid = result.variationId || ""; // Webflow Optimize Variant ID
-      newPageview.expt.vna = result.variationName || ""; // Webflow Optimize Variant Name
-    });
-  });
+  // TODO: Troubleshoot, and work with Webflow to get this working
+  // var wf = Webflow || [];
+  //   wf.ready(function () {
+  //     wf.onVariationRecorded(function (result) {
+  //       newPageview.expt.eid = result.experienceId || ""; // Webflow Optimize Experiment ID
+  //       newPageview.expt.ena = result.experienceName || ""; // Webflow Optimize Experiment Name
+  //       newPageview.expt.etp = result.experienceType || ""; // Webflow Optimize Experiment Type
+  //       newPageview.expt.vid = result.variationId || ""; // Webflow Optimize Variant ID
+  //       newPageview.expt.vna = result.variationName || ""; // Webflow Optimize Variant Name
+  //     });
+  //});
 
   window.fpaData.ses[0].pvs.unshift(newPageview);
   // If pvs is more than 20 items long, remove the oldest pageview object.
