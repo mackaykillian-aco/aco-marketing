@@ -1,4 +1,4 @@
-console.log("FPA V1.3.0");
+console.log("FPA V1.3.1");
 
 const DEBUG = true;
 function debugLog(message) {
@@ -7,7 +7,7 @@ function debugLog(message) {
   }
 }
 
-const DOMAIN = "awardco-stg.webflow.io";
+const DOMAIN = window.location.hostname;
 const MAX_SESSIONS = 5;
 const MAX_PAGEVIEWS = 25;
 
@@ -47,7 +47,6 @@ var fpaDataTemplate = {
       pvs: [
         {
           path: "", // Page path
-          ttl: "", // Page title
           top: "", // Time on page
           pvst: 0, // Pageview start time
           expt: {
@@ -202,7 +201,6 @@ function updatePageviewData() {
   // Add new pageview object to pvs array
   let newPageview = structuredClone(fpaDataTemplate.ses[0].pvs[0]);
   newPageview.path = window.location.pathname;
-  // newPageview.ttl = document.title;
   newPageview.pvst = Date.now();
 
   // Record Webflow Optimize Experiment and Variation Data if available
