@@ -1,4 +1,4 @@
-console.log("FPA V1.2.11");
+console.log("FPA V1.2.12");
 
 const DEBUG = true;
 function debugLog(message) {
@@ -86,12 +86,6 @@ function initFpaDataCookie() {
   }
   debugLog("initFpaDataCookie() ->");
 }
-initFpaDataCookie();
-
-/*** READ COOKIE ***/
-const cookieValue = JSON.parse(Cookies.get("_fpa_data")); // Read cookie and store in global variable
-window.fpaData = cookieValue;
-debugLog("Cookie READ complete");
 
 /*** UPDATE COOKIE ***/
 // 1. Update USER Level Data
@@ -141,9 +135,6 @@ function updateSessionLevelData() {
 
   window.fpaData.ses[0].cpv = window.location.pathname;
   window.fpaData.ses[0].pgc += 1;
-  window.fpaData.ses[0].tsos = millisToMinutesAndSeconds(
-    Date.now() - window.fpaData.ses[0].sst
-  ); // We could only store the sst and subtract it from Date.now() when form submits
   debugLog("updateSessionLevelData() ->");
 }
 
@@ -199,18 +190,14 @@ function updatePageviewData() {
   newPageview.ttl = document.title;
   newPageview.pvst = Date.now();
 
-  // Add Experiment Data if available
-  // TODO: Troubleshoot, and work with Webflow to get this working
-  // var wf = Webflow || [];
-  //   wf.ready(function () {
-  //     wf.onVariationRecorded(function (result) {
-  //       newPageview.expt.eid = result.experienceId || ""; // Webflow Optimize Experiment ID
-  //       newPageview.expt.ena = result.experienceName || ""; // Webflow Optimize Experiment Name
-  //       newPageview.expt.etp = result.experienceType || ""; // Webflow Optimize Experiment Type
-  //       newPageview.expt.vid = result.variationId || ""; // Webflow Optimize Variant ID
-  //       newPageview.expt.vna = result.variationName || ""; // Webflow Optimize Variant Name
-  //     });
-  //});
+  // Record Webflow Optimize Experiment and Variation Data if available
+  //   wf.onVariationRecorded(function (result) {
+  //     newPageview.expt.eid = result.experienceId || ""; // Webflow Optimize Experiment ID
+  //     newPageview.expt.ena = result.experienceName || ""; // Webflow Optimize Experiment Name
+  //     newPageview.expt.etp = result.experienceType || ""; // Webflow Optimize Experiment Type
+  //     newPageview.expt.vid = result.variationId || ""; // Webflow Optimize Variant ID
+  //     newPageview.expt.vna = result.variationName || ""; // Webflow Optimize Variant Name
+  //   });
 
   if (!window.fpaData.ses[0].pvs[0].path) {
     window.fpaData.ses[0].pvs[0] = newPageview;
@@ -225,32 +212,44 @@ function updatePageviewData() {
   }
 }
 
-// 3.1 Populate EXPT Values
+/*****
+ *** MAIN EXECUTION FLOW ***
+ *****/
 
-// 4. Execute Update Functions In Order
-updateUserLevelData();
-updateSessionLevelData();
-populateAttrValues();
-populateAdsValues();
-updatePageviewData();
+wf.ready(function () {
+  // Initialize Cookie
+  initFpaDataCookie();
 
-/*** WRITE COOKIE ***/
-window.addEventListener("beforeunload", function () {
-  // TODO: Time on Session, Time on Pageiew, and Last activity Record here
-  window.fpaData.lact = Date.now();
-  window.fpaData.ses[0].tsos = millisToMinutesAndSeconds(
-    Date.now() - window.fpaData.ses[0].sst
-  );
-  window.fpaData.ses[0].pvs[0].top = millisToMinutesAndSeconds(
-    Date.now() - window.fpaData.ses[0].pvs[0].pvst
-  );
+  // Read Cookie
+  const cookieValue = JSON.parse(Cookies.get("_fpa_data")); // Read cookie and store in global variable
+  window.fpaData = cookieValue;
+  debugLog("Cookie READ complete");
 
-  // Write cookie on page unload
-  Cookies.set("_fpa_data", JSON.stringify(window.fpaData), {
-    expires: 183,
-    path: "/",
+  // Update Global Variable fpaData
+  updateUserLevelData();
+  updateSessionLevelData();
+  populateAttrValues();
+  populateAdsValues();
+  updatePageviewData();
+
+  // Write Cookie
+  window.addEventListener("beforeunload", function () {
+    // Time on Session, Time on Pageiew, and Last activity Record here
+    window.fpaData.lact = Date.now();
+    window.fpaData.ses[0].tsos = millisToMinutesAndSeconds(
+      Date.now() - window.fpaData.ses[0].sst
+    );
+    window.fpaData.ses[0].pvs[0].top = millisToMinutesAndSeconds(
+      Date.now() - window.fpaData.ses[0].pvs[0].pvst
+    );
+
+    // Write cookie on page unload
+    Cookies.set("_fpa_data", JSON.stringify(window.fpaData), {
+      expires: 183,
+      path: "/",
+    });
+    debugLog("Cookie WRITE complete");
+
+    // TODO: LATER: Consider using navigator.sendBeacon() for more reliable data sending
   });
-  debugLog("Cookie WRITE complete");
-
-  // TODO: LATER: Consider using navigator.sendBeacon() for more reliable data sending
 });
