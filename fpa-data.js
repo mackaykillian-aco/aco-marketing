@@ -1,4 +1,4 @@
-console.log("FPA V1.2.6");
+console.log("FPA V1.2.7");
 
 const DEBUG = true;
 function debugLog(message) {
