@@ -1,4 +1,4 @@
-console.log("FPA V1.2.10");
+console.log("FPA V1.2.11");
 
 const DEBUG = true;
 function debugLog(message) {
@@ -212,7 +212,12 @@ function updatePageviewData() {
   //     });
   //});
 
-  window.fpaData.ses[0].pvs.unshift(newPageview);
+  if (!window.fpaData.ses[0].pvs[0].path) {
+    window.fpaData.ses[0].pvs[0] = newPageview;
+  } else {
+    window.fpaData.ses[0].pvs.unshift(newPageview);
+  }
+
   // If pvs is more than 20 items long, remove the oldest pageview object.
   if (window.fpaData.ses[0].pvs.length > MAX_PAGEVIEWS) {
     window.fpaData.ses[0].pvs.length = MAX_PAGEVIEWS;
@@ -232,6 +237,13 @@ updatePageviewData();
 /*** WRITE COOKIE ***/
 window.addEventListener("beforeunload", function () {
   // TODO: Time on Session, Time on Pageiew, and Last activity Record here
+  window.fpaData.lact = Date.now();
+  window.fpaData.ses[0].tsos = millisToMinutesAndSeconds(
+    Date.now() - window.fpaData.ses[0].sst
+  );
+  window.fpaData.ses[0].pvs[0].top = millisToMinutesAndSeconds(
+    Date.now() - window.fpaData.ses[0].pvs[0].pvst
+  );
 
   // Write cookie on page unload
   Cookies.set("_fpa_data", JSON.stringify(window.fpaData), {
