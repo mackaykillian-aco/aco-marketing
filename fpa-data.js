@@ -1,4 +1,4 @@
-console.log("FPA V1.2.8");
+console.log("FPA V1.2.9");
 
 const DEBUG = true;
 function debugLog(message) {
@@ -226,6 +226,7 @@ updateUserLevelData();
 updateSessionLevelData();
 populateAttrValues();
 populateAdsValues();
+updatePageviewData();
 
 /*** WRITE COOKIE ***/
 window.addEventListener("beforeunload", function () {
