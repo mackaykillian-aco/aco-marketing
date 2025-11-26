@@ -1,5 +1,6 @@
-console.log("Dev Version: 1.1.0");
+console.log("FPA V1.1.1");
 
+/*** DEFINE MODEL ***/
 var fpaDataTemplate = {
   cid: "",
   fact: 0, // first activity
@@ -49,46 +50,7 @@ var fpaDataTemplate = {
   ],
 };
 
-const sesTemplate = {
-  sid: "", // Session ID
-  pgc: 0, // Page count
-  sst: 0, // Session start time
-  tsos: 0, // Time spent on site
-  ldp: "", // Landing page (session entry point)
-  cvp: "", // Conversion page (session conversion point)
-  ref: "", // Referring URL
-  attr: {
-    src: "", // UTM Source
-    med: "", // UTM Medium
-    cmp: "", // UTM Campaign
-    trm: "", // UTM Term
-    kwd: "", // UTM Keyword
-    cnt: "", // UTM Content
-  },
-  ads: {
-    gcl_id: "", // GCLID (Google Ads)
-    dcl_id: "", // DCLID (Doubleclick Ads)
-    msft_id: "", // Microsoft Ads ID
-    lnkd_id: "", // LinkedIn Ads ID
-    meta_id: "", // Meta Ads ID
-  },
-  pvs: [
-    {
-      path: "", // Page path
-      ttl: "", // Page title
-      top: "", // Time on page
-      expt: {
-        eid: "", // Webflow Optimize Experiment ID
-        ena: "", // Webflow Optimize Experiment Name
-        etp: "", // Webflow Optimize Experiment Type
-        vid: "", // Webflow Optimize Variant ID
-        vna: "", // Webflow Optimize Variant Name
-      },
-    },
-  ],
-};
-
-// Init FPA DATA Cookie
+/*** INITIALIZE COOKIE ***/
 function initFpaDataCookie() {
   if (!Cookies.get("_fpa_data")) {
     const value = structuredClone(fpaDataTemplate);
@@ -101,80 +63,92 @@ function initFpaDataCookie() {
   }
 }
 
+/*** READ COOKIE ***/
+const cookieValue = JSON.parse(Cookies.get("_fpa_data")); // Read cookie and store in global variable
+window.fpaData = cookieValue;
+
+/*** UPDATE COOKIE ***/
+// 1. Update USER Level Data
 function updateUserLevelData() {
-  var value = JSON.parse(Cookies.get("_fpa_data"));
+  //var value = JSON.parse(Cookies.get("_fpa_data"));
 
   // Populate GA Client ID (If it's null keep as is)
   // TODO: Test in Production
-  value.ga_cid = Cookies.get("_ga", { domain: "awardco.com" })
+  window.fpaData.ga_cid = Cookies.get("_ga", { domain: "awardco.com" })
     ? JSON.parse(Cookies.get("_ga", { domain: "awardco.com" }))
-    : value.ga_cid;
+    : window.fpaData.ga_cid;
 
   // Populate HSU ID (If doesn't match, replace)
   // TODO: Test in Production
-  value.hsu_id = Cookies.get("hubspotutk", { domain: "awardco.com" })
+  window.fpaData.hsu_id = Cookies.get("hubspotutk", { domain: "awardco.com" })
     ? JSON.parse(Cookies.get("hubspotutk", { domain: "awardco.com" }))
-    : value.hsu_id;
+    : window.fpaData.hsu_id;
 
   // TODO: LATER: Populate Wf Attribute (When we have a strategy ready)
 
   // If last session is 24+ hours old, create new session object and push to ses array.
   // TODO: if ses is more than 5 items long, remove the oldest session object.
-  if (value.lact) {
-    const sessionExpired = Date.now() - value.lact > 24 * 60 * 60 * 1000;
+  if (window.fpaData.lact) {
+    const sessionExpired =
+      Date.now() - window.fpaData.lact > 24 * 60 * 60 * 1000;
 
     if (sessionExpired) {
-      value.ses.unshift(structuredClone(sesTemplate));
+      window.fpaData.ses.unshift(structuredClone(fpaDataTemplate.ses[0]));
       console.log("new session started");
     }
   }
 
   // Update last activity timestamp
-  value.lact = Date.now();
-
-  Cookies.set("_fpa_data", JSON.stringify(value), {
-    expires: 183,
-    path: "/",
-  });
+  window.fpaData.lact = Date.now();
 }
 
+// 2. Update SESSION Level Data
 function updateSessionLevelData() {
-  var value = JSON.parse(Cookies.get("_fpa_data"));
-  if (!value.ses.sid) {
-    value.ses.sid = crypto.randomUUID();
-    value.ses.sst = Date.now();
-    value.ses.ldp = value.ses.ldp || window.location.path;
+  if (!window.fpaData.ses.sid) {
+    window.fpaData.ses.sid = crypto.randomUUID();
+    window.fpaData.ses.sst = Date.now();
+    window.fpaData.ses.ldp = window.fpaData.ses.ldp || window.location.path;
     //referring url? how to get accurately?
   }
-  value.ses.pgc += 1;
-  value.ses.tsos = Date.now() - value.ses.sst; // We could only store the sst and subtract it from Date.now() when form submits
+  window.fpaData.ses.pgc += 1;
+  window.fpaData.ses.tsos = Date.now() - window.fpaData.ses.sst; // We could only store the sst and subtract it from Date.now() when form submits
 }
 
-// 1. Populate ATTR Values
+// 2.1 Populate ATTR Values
 function populateAttrValues() {
-  var value = JSON.parse(Cookies.get("_fpa_data"));
-
   var queryString = window.location.search;
   var urlParams = new URLSearchParams(queryString);
 
-  console.log("attr.src 1", value.ses[0].attr.src);
-  value.ses[0].attr.src = value.ses[0].attr.src || urlParams.get("utm_source");
-  console.log("attr.src 2", value.ses[0].attr.src);
-  value.ses[0].attr.med = value.ses[0].attr.med || urlParams.get("utm_medium");
-  value.ses[0].attr.cmp =
-    value.ses[0].attr.cmp || urlParams.get("utm_campaign");
-  value.ses[0].attr.trm = value.ses[0].attr.trm || urlParams.get("utm_term");
-  value.ses[0].attr.kwd = value.ses[0].attr.kwd || urlParams.get("utm_keyword");
-  value.ses[0].attr.cnt = value.ses[0].attr.cnt || urlParams.get("utm_content");
-
-  Cookies.set("_fpa_data", JSON.stringify(value), { expires: 365, path: "/" });
+  window.fpaData.ses[0].attr.src =
+    window.fpaData.ses[0].attr.src || urlParams.get("utm_source");
+  window.fpaData.ses[0].attr.med =
+    window.fpaData.ses[0].attr.med || urlParams.get("utm_medium");
+  window.fpaData.ses[0].attr.cmp =
+    window.fpaData.ses[0].attr.cmp || urlParams.get("utm_campaign");
+  window.fpaData.ses[0].attr.trm =
+    window.fpaData.ses[0].attr.trm || urlParams.get("utm_term");
+  window.fpaData.ses[0].attr.kwd =
+    window.fpaData.ses[0].attr.kwd || urlParams.get("utm_keyword");
+  window.fpaData.ses[0].attr.cnt =
+    window.fpaData.ses[0].attr.cnt || urlParams.get("utm_content");
 }
 
-// 2. Populate EXPT Values
+// 3. Update PAGEVIEW Level Data
 
-// 3. Populate SES Values
+// 3.1 Populate EXPT Values
 
-// Execute Functions
+// 4. Execute Functions In Order
 initFpaDataCookie();
 updateUserLevelData();
 populateAttrValues();
+
+/*** WRITE COOKIE ***/
+window.addEventListener("beforeunload", function () {
+  // Write cookie on page unload
+  Cookies.set("_fpa_data", JSON.stringify(window.fpaData), {
+    expires: 183,
+    path: "/",
+  });
+
+  // TODO: LATER: Consider using navigator.sendBeacon() for more reliable data sending
+});
