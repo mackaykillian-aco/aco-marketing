@@ -1,4 +1,4 @@
-console.log("Dev Version: 1.0.7");
+console.log("Dev Version: 1.1.0");
 
 var fpaDataTemplate = {
   cid: "",
@@ -11,6 +11,7 @@ var fpaDataTemplate = {
     {
       sid: "", // Session ID
       pgc: 0, // Page count
+      sst: 0, // Session start time
       tsos: 0, // Time spent on site
       ldp: "", // Landing page (session entry point)
       cvp: "", // Conversion page (session conversion point)
@@ -48,6 +49,45 @@ var fpaDataTemplate = {
   ],
 };
 
+const sesTemplate = {
+  sid: "", // Session ID
+  pgc: 0, // Page count
+  sst: 0, // Session start time
+  tsos: 0, // Time spent on site
+  ldp: "", // Landing page (session entry point)
+  cvp: "", // Conversion page (session conversion point)
+  ref: "", // Referring URL
+  attr: {
+    src: "", // UTM Source
+    med: "", // UTM Medium
+    cmp: "", // UTM Campaign
+    trm: "", // UTM Term
+    kwd: "", // UTM Keyword
+    cnt: "", // UTM Content
+  },
+  ads: {
+    gcl_id: "", // GCLID (Google Ads)
+    dcl_id: "", // DCLID (Doubleclick Ads)
+    msft_id: "", // Microsoft Ads ID
+    lnkd_id: "", // LinkedIn Ads ID
+    meta_id: "", // Meta Ads ID
+  },
+  pvs: [
+    {
+      path: "", // Page path
+      ttl: "", // Page title
+      top: "", // Time on page
+      expt: {
+        eid: "", // Webflow Optimize Experiment ID
+        ena: "", // Webflow Optimize Experiment Name
+        etp: "", // Webflow Optimize Experiment Type
+        vid: "", // Webflow Optimize Variant ID
+        vna: "", // Webflow Optimize Variant Name
+      },
+    },
+  ],
+};
+
 // Init FPA DATA Cookie
 function initFpaDataCookie() {
   if (!Cookies.get("_fpa_data")) {
@@ -64,9 +104,6 @@ function initFpaDataCookie() {
 function updateUserLevelData() {
   var value = JSON.parse(Cookies.get("_fpa_data"));
 
-  // Update last activity timestamp
-  value.lact = Date.now();
-
   // Populate GA Client ID (If it's null keep as is)
   // TODO: Test in Production
   value.ga_cid = Cookies.get("_ga", { domain: "awardco.com" })
@@ -81,6 +118,20 @@ function updateUserLevelData() {
 
   // TODO: LATER: Populate Wf Attribute (When we have a strategy ready)
 
+  // If last session is 24+ hours old, create new session object and push to ses array.
+  // TODO: if ses is more than 5 items long, remove the oldest session object.
+  if (value.lact) {
+    const sessionExpired = Date.now() - value.lact > 24 * 60 * 60 * 1000;
+
+    if (sessionExpired) {
+      value.ses.unshift(structuredClone(sesTemplate));
+      console.log("new session started");
+    }
+  }
+
+  // Update last activity timestamp
+  value.lact = Date.now();
+
   Cookies.set("_fpa_data", JSON.stringify(value), {
     expires: 183,
     path: "/",
@@ -88,8 +139,15 @@ function updateUserLevelData() {
 }
 
 function updateSessionLevelData() {
-  // TODO: If last session is 24+ hours old, create new session object and push to ses array.
-  // if ses is more than 5 items long, remove the oldest session object.
+  var value = JSON.parse(Cookies.get("_fpa_data"));
+  if (!value.ses.sid) {
+    value.ses.sid = crypto.randomUUID();
+    value.ses.sst = Date.now();
+    value.ses.ldp = value.ses.ldp || window.location.path;
+    //referring url? how to get accurately?
+  }
+  value.ses.pgc += 1;
+  value.ses.tsos = Date.now() - value.ses.sst; // We could only store the sst and subtract it from Date.now() when form submits
 }
 
 // 1. Populate ATTR Values
