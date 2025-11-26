@@ -1,4 +1,4 @@
-console.log("FPA V1.2.5");
+console.log("FPA V1.2.6");
 
 const DEBUG = true;
 function debugLog(message) {
@@ -8,6 +8,7 @@ function debugLog(message) {
 }
 
 const DOMAIN = "awardco-stg.webflow.io";
+const TEST_DATE = new Date("2025-12-01T12:00:00Z");
 
 /*** DEFINE MODEL ***/
 var fpaDataTemplate = {
@@ -109,7 +110,7 @@ function updateUserLevelData() {
   // TODO: if ses is more than 5 items long, remove the oldest session object.
   if (window.fpaData.lact) {
     const sessionExpired =
-      Date.now() - window.fpaData.lact > 24 * 60 * 60 * 1000;
+      TEST_DATE - window.fpaData.lact > 24 * 60 * 60 * 1000; // TODO: Remove test date value
 
     if (sessionExpired) {
       window.fpaData.ses.unshift(structuredClone(fpaDataTemplate.ses[0]));
