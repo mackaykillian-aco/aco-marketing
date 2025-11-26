@@ -1,4 +1,4 @@
-console.log("FPA V1.2.1");
+console.log("FPA V1.2.2");
 
 const DEBUG = true;
 function debugLog(message) {
@@ -115,14 +115,14 @@ function updateUserLevelData() {
 // 2. Update SESSION Level Data
 function updateSessionLevelData() {
   debugLog("-> updateSessionLevelData()");
-  if (!window.fpaData.ses.sid) {
-    window.fpaData.ses.sid = crypto.randomUUID();
-    window.fpaData.ses.sst = Date.now();
-    window.fpaData.ses.ldp = window.fpaData.ses.ldp || window.location.path;
+  if (!window.fpaData.ses[0].sid) {
+    window.fpaData.ses[0].sid = crypto.randomUUID();
+    window.fpaData.ses[0].sst = Date.now();
+    window.fpaData.ses[0].ldp = window.fpaData.ses.ldp || window.location.path;
     //referring url? how to get accurately?
   }
-  window.fpaData.ses.pgc += 1;
-  window.fpaData.ses.tsos = Date.now() - window.fpaData.ses.sst; // We could only store the sst and subtract it from Date.now() when form submits
+  window.fpaData.ses[0].pgc += 1;
+  window.fpaData.ses[0].tsos = Date.now() - window.fpaData.ses.sst; // We could only store the sst and subtract it from Date.now() when form submits
   debugLog("updateSessionLevelData() ->");
 }
 
