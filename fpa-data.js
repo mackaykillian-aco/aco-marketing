@@ -1,4 +1,4 @@
-console.log("FPA V1.1.2");
+console.log("FPA V1.1.3");
 
 const DEBUG = true;
 function debugLog(message) {
@@ -71,6 +71,7 @@ function initFpaDataCookie() {
   }
   debugLog("initFpaDataCookie() executed.");
 }
+initFpaDataCookie();
 
 /*** READ COOKIE ***/
 const cookieValue = JSON.parse(Cookies.get("_fpa_data")); // Read cookie and store in global variable
@@ -146,8 +147,7 @@ function populateAttrValues() {
 
 // 3.1 Populate EXPT Values
 
-// 4. Execute Functions In Order
-initFpaDataCookie();
+// 4. Execute Update Functions In Order
 updateUserLevelData();
 populateAttrValues();
 
