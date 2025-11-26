@@ -1,4 +1,4 @@
-console.log("FPA V1.3.1");
+console.log("FPA V1.3.3");
 
 const DEBUG = true;
 function debugLog(message) {
@@ -8,6 +8,7 @@ function debugLog(message) {
 }
 
 const DOMAIN = window.location.hostname;
+debugLog("Domain set to: " + DOMAIN);
 const MAX_SESSIONS = 5;
 const MAX_PAGEVIEWS = 25;
 
@@ -104,8 +105,7 @@ function initFpaDataLsItem() {
 /*** UPDATE LS ITEM ***/
 // 1. Update USER Level Data
 function updateUserLevelData() {
-  // Populate GA Client ID (If it's null keep as is)
-  // TODO: Test in Production
+  debugLog("-> updateUserLevelData()");
   window.fpaData.ga_cid =
     Cookies.get("_ga", { domain: DOMAIN }) || window.fpaData.ga_cid;
 
@@ -133,8 +133,7 @@ function updateUserLevelData() {
     }
   }
 
-  // Update last activity timestamp
-  window.fpaData.lact = Date.now();
+  debugLog("updateUserLevelData() ->");
 }
 
 // 2. Update SESSION Level Data
@@ -204,13 +203,14 @@ function updatePageviewData() {
   newPageview.pvst = Date.now();
 
   // Record Webflow Optimize Experiment and Variation Data if available
-  //   wf.onVariationRecorded(function (result) {
-  //     newPageview.expt.eid = result.experienceId || ""; // Webflow Optimize Experiment ID
-  //     newPageview.expt.ena = result.experienceName || ""; // Webflow Optimize Experiment Name
-  //     newPageview.expt.etp = result.experienceType || ""; // Webflow Optimize Experiment Type
-  //     newPageview.expt.vid = result.variationId || ""; // Webflow Optimize Variant ID
-  //     newPageview.expt.vna = result.variationName || ""; // Webflow Optimize Variant Name
-  //   });
+  // TODO: Troubleshoot why this isn't working as expected.
+  wf.onVariationRecorded(function (result) {
+    newPageview.expt.eid = result.experienceId || ""; // Webflow Optimize Experiment ID
+    newPageview.expt.ena = result.experienceName || ""; // Webflow Optimize Experiment Name
+    newPageview.expt.etp = result.experienceType || ""; // Webflow Optimize Experiment Type
+    newPageview.expt.vid = result.variationId || ""; // Webflow Optimize Variant ID
+    newPageview.expt.vna = result.variationName || ""; // Webflow Optimize Variant Name
+  });
 
   if (!window.fpaData.ses[0].pvs[0].path) {
     window.fpaData.ses[0].pvs[0] = newPageview;
@@ -218,7 +218,7 @@ function updatePageviewData() {
     window.fpaData.ses[0].pvs.unshift(newPageview);
   }
 
-  // If pvs is more than 20 items long, remove the oldest pageview object.
+  // If pvs is longer that max amount, remove the oldest pageview object.
   if (window.fpaData.ses[0].pvs.length > MAX_PAGEVIEWS) {
     window.fpaData.ses[0].pvs.length = MAX_PAGEVIEWS;
     debugLog("old pageviews removed to maintain max pageviews");
@@ -261,6 +261,6 @@ wf.ready(function () {
     localStorage.setItem("_fpa_data", JSON.stringify(window.fpaData));
     debugLog("LS Item WRITE complete");
 
-    // TODO: LATER: Consider using navigator.sendBeacon() for more reliable data sending
+    // TODO: LATER: Consider using navigator.sendBeacon() for more reliable data sending. Send to Airtable?
   });
 });
