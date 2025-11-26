@@ -1,4 +1,4 @@
-console.log("FPA V1.2.2");
+console.log("FPA V1.2.3");
 
 const DEBUG = true;
 function debugLog(message) {
@@ -24,7 +24,7 @@ var fpaDataTemplate = {
       sst: 0, // Session start time
       tsos: 0, // Time spent on site
       ldp: "", // Landing page (session entry point)
-      cvp: "", // Conversion page (session conversion point)
+      cpv: "", // Current Page View (can be used for Conversion page on form submit)
       ref: "", // Referring URL
       attr: {
         src: "", // UTM Source
@@ -118,11 +118,13 @@ function updateSessionLevelData() {
   if (!window.fpaData.ses[0].sid) {
     window.fpaData.ses[0].sid = crypto.randomUUID();
     window.fpaData.ses[0].sst = Date.now();
-    window.fpaData.ses[0].ldp = window.fpaData.ses.ldp || window.location.path;
-    //referring url? how to get accurately?
+    window.fpaData.ses[0].ldp =
+      window.fpaData.ses[0].ldp || window.location.pathname;
   }
+
+  window.fpaData.ses[0].cpv = window.location.pathname;
   window.fpaData.ses[0].pgc += 1;
-  window.fpaData.ses[0].tsos = Date.now() - window.fpaData.ses.sst; // We could only store the sst and subtract it from Date.now() when form submits
+  window.fpaData.ses[0].tsos = Date.now() - window.fpaData.ses[0].sst; // We could only store the sst and subtract it from Date.now() when form submits
   debugLog("updateSessionLevelData() ->");
 }
 
