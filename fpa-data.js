@@ -1,4 +1,11 @@
-console.log("FPA V1.1.1");
+console.log("FPA V1.1.2");
+
+const DEBUG = true;
+function debugLog(message) {
+  if (DEBUG) {
+    console.log(message);
+  }
+}
 
 /*** DEFINE MODEL ***/
 var fpaDataTemplate = {
@@ -53,6 +60,7 @@ var fpaDataTemplate = {
 /*** INITIALIZE COOKIE ***/
 function initFpaDataCookie() {
   if (!Cookies.get("_fpa_data")) {
+    debugLog("FPA Cookie not found. Creating new cookie.");
     const value = structuredClone(fpaDataTemplate);
     value.cid = crypto.randomUUID();
     value.fact = Date.now();
@@ -61,6 +69,7 @@ function initFpaDataCookie() {
       path: "/",
     });
   }
+  debugLog("initFpaDataCookie() executed.");
 }
 
 /*** READ COOKIE ***/
