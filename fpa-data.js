@@ -1,4 +1,4 @@
-console.log("FPA V1.1.3");
+console.log("FPA V1.2.0");
 
 const DEBUG = true;
 function debugLog(message) {
@@ -59,6 +59,7 @@ var fpaDataTemplate = {
 
 /*** INITIALIZE COOKIE ***/
 function initFpaDataCookie() {
+  debugLog("-> initFpaDataCookie()");
   if (!Cookies.get("_fpa_data")) {
     debugLog("FPA Cookie not found. Creating new cookie.");
     const value = structuredClone(fpaDataTemplate);
@@ -69,13 +70,14 @@ function initFpaDataCookie() {
       path: "/",
     });
   }
-  debugLog("initFpaDataCookie() executed.");
+  debugLog("initFpaDataCookie() ->");
 }
 initFpaDataCookie();
 
 /*** READ COOKIE ***/
 const cookieValue = JSON.parse(Cookies.get("_fpa_data")); // Read cookie and store in global variable
 window.fpaData = cookieValue;
+debugLog("Cookie READ complete");
 
 /*** UPDATE COOKIE ***/
 // 1. Update USER Level Data
@@ -114,6 +116,7 @@ function updateUserLevelData() {
 
 // 2. Update SESSION Level Data
 function updateSessionLevelData() {
+  debugLog("-> updateSessionLevelData()");
   if (!window.fpaData.ses.sid) {
     window.fpaData.ses.sid = crypto.randomUUID();
     window.fpaData.ses.sst = Date.now();
@@ -122,10 +125,12 @@ function updateSessionLevelData() {
   }
   window.fpaData.ses.pgc += 1;
   window.fpaData.ses.tsos = Date.now() - window.fpaData.ses.sst; // We could only store the sst and subtract it from Date.now() when form submits
+  debugLog("updateSessionLevelData() ->");
 }
 
 // 2.1 Populate ATTR Values
 function populateAttrValues() {
+  debugLog("-> populateAttrValues()");
   var queryString = window.location.search;
   var urlParams = new URLSearchParams(queryString);
 
@@ -141,6 +146,8 @@ function populateAttrValues() {
     window.fpaData.ses[0].attr.kwd || urlParams.get("utm_keyword");
   window.fpaData.ses[0].attr.cnt =
     window.fpaData.ses[0].attr.cnt || urlParams.get("utm_content");
+
+  debugLog("populateAttrValues() ->");
 }
 
 // 3. Update PAGEVIEW Level Data
@@ -149,6 +156,7 @@ function populateAttrValues() {
 
 // 4. Execute Update Functions In Order
 updateUserLevelData();
+updateSessionLevelData();
 populateAttrValues();
 
 /*** WRITE COOKIE ***/
@@ -158,6 +166,7 @@ window.addEventListener("beforeunload", function () {
     expires: 183,
     path: "/",
   });
+  debugLog("Cookie WRITE complete");
 
   // TODO: LATER: Consider using navigator.sendBeacon() for more reliable data sending
 });
