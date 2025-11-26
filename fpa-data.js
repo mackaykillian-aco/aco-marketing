@@ -1,4 +1,4 @@
-console.log("FPA V1.2.12");
+console.log("FPA V1.3.0");
 
 const DEBUG = true;
 function debugLog(message) {
@@ -9,7 +9,7 @@ function debugLog(message) {
 
 const DOMAIN = "awardco-stg.webflow.io";
 const MAX_SESSIONS = 5;
-const MAX_PAGEVIEWS = 20;
+const MAX_PAGEVIEWS = 25;
 
 /*** DEFINE MODEL ***/
 var fpaDataTemplate = {
@@ -63,6 +63,8 @@ var fpaDataTemplate = {
   ],
 };
 
+/*** UTILITY FUNCTIONS ***/
+
 function millisToMinutesAndSeconds(millis) {
   var minutes = Math.floor(millis / 60000);
   var seconds = ((millis % 60000) / 1000).toFixed(0);
@@ -71,23 +73,36 @@ function millisToMinutesAndSeconds(millis) {
     : minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
 }
 
-/*** INITIALIZE COOKIE ***/
-function initFpaDataCookie() {
-  debugLog("-> initFpaDataCookie()");
-  if (!Cookies.get("_fpa_data")) {
-    debugLog("FPA Cookie not found. Creating new cookie.");
+function getObectSizeKB(obj) {
+  if (typeof obj !== "object" || obj === null) {
+    console.warn("Input is not a valid JavaScript object.");
+    return null;
+  }
+  try {
+    const jsonString = JSON.stringify(obj);
+    const sizeInBytes = new Blob([jsonString]).size;
+    const sizeInKB = sizeInBytes / 1024;
+    return sizeInKB;
+  } catch (e) {
+    console.error("Error serializing or measuring object size:", e);
+    return null;
+  }
+}
+
+/*** INITIALIZE LS ITEM ***/
+function initFpaDataLsItem() {
+  debugLog("-> initFpaDataLsItem()");
+  if (!localStorage.getItem("_fpa_data")) {
+    debugLog("FPA LS Item not found. Creating new LS Item.");
     const value = structuredClone(fpaDataTemplate);
     value.cid = crypto.randomUUID();
     value.fact = Date.now();
-    Cookies.set("_fpa_data", JSON.stringify(value), {
-      expires: 183,
-      path: "/",
-    });
+    localStorage.setItem("_fpa_data", JSON.stringify(value));
   }
-  debugLog("initFpaDataCookie() ->");
+  debugLog("initFpaDataLsItem() ->");
 }
 
-/*** UPDATE COOKIE ***/
+/*** UPDATE LS ITEM ***/
 // 1. Update USER Level Data
 function updateUserLevelData() {
   // Populate GA Client ID (If it's null keep as is)
@@ -187,7 +202,7 @@ function updatePageviewData() {
   // Add new pageview object to pvs array
   let newPageview = structuredClone(fpaDataTemplate.ses[0].pvs[0]);
   newPageview.path = window.location.pathname;
-  newPageview.ttl = document.title;
+  // newPageview.ttl = document.title;
   newPageview.pvst = Date.now();
 
   // Record Webflow Optimize Experiment and Variation Data if available
@@ -210,6 +225,7 @@ function updatePageviewData() {
     window.fpaData.ses[0].pvs.length = MAX_PAGEVIEWS;
     debugLog("old pageviews removed to maintain max pageviews");
   }
+  debugLog("updatePageviewData() ->");
 }
 
 /*****
@@ -217,13 +233,13 @@ function updatePageviewData() {
  *****/
 
 wf.ready(function () {
-  // Initialize Cookie
-  initFpaDataCookie();
+  // Initialize LS Item
+  initFpaDataLsItem();
 
-  // Read Cookie
-  const cookieValue = JSON.parse(Cookies.get("_fpa_data")); // Read cookie and store in global variable
-  window.fpaData = cookieValue;
-  debugLog("Cookie READ complete");
+  // Read LS Item
+  const itemValue = JSON.parse(localStorage.getItem("_fpa_data")); // Read LS Item and store in global variable
+  window.fpaData = itemValue;
+  debugLog("LS Item READ complete");
 
   // Update Global Variable fpaData
   updateUserLevelData();
@@ -232,7 +248,7 @@ wf.ready(function () {
   populateAdsValues();
   updatePageviewData();
 
-  // Write Cookie
+  // Write LS Item
   window.addEventListener("beforeunload", function () {
     // Time on Session, Time on Pageiew, and Last activity Record here
     window.fpaData.lact = Date.now();
@@ -243,12 +259,9 @@ wf.ready(function () {
       Date.now() - window.fpaData.ses[0].pvs[0].pvst
     );
 
-    // Write cookie on page unload
-    Cookies.set("_fpa_data", JSON.stringify(window.fpaData), {
-      expires: 183,
-      path: "/",
-    });
-    debugLog("Cookie WRITE complete");
+    // Write LS Item on page unload
+    localStorage.setItem("_fpa_data", JSON.stringify(window.fpaData));
+    debugLog("LS Item WRITE complete");
 
     // TODO: LATER: Consider using navigator.sendBeacon() for more reliable data sending
   });
