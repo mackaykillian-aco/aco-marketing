@@ -1,4 +1,4 @@
-console.log("FPA V1.2.0");
+console.log("FPA V1.2.1");
 
 const DEBUG = true;
 function debugLog(message) {
@@ -6,6 +6,8 @@ function debugLog(message) {
     console.log(message);
   }
 }
+
+const DOMAIN = "awardco-stg.webflow.io";
 
 /*** DEFINE MODEL ***/
 var fpaDataTemplate = {
@@ -82,19 +84,15 @@ debugLog("Cookie READ complete");
 /*** UPDATE COOKIE ***/
 // 1. Update USER Level Data
 function updateUserLevelData() {
-  //var value = JSON.parse(Cookies.get("_fpa_data"));
-
   // Populate GA Client ID (If it's null keep as is)
   // TODO: Test in Production
-  window.fpaData.ga_cid = Cookies.get("_ga", { domain: "awardco.com" })
-    ? JSON.parse(Cookies.get("_ga", { domain: "awardco.com" }))
-    : window.fpaData.ga_cid;
+  window.fpaData.ga_cid =
+    Cookies.get("_ga", { domain: DOMAIN }) || window.fpaData.ga_cid;
 
   // Populate HSU ID (If doesn't match, replace)
   // TODO: Test in Production
-  window.fpaData.hsu_id = Cookies.get("hubspotutk", { domain: "awardco.com" })
-    ? JSON.parse(Cookies.get("hubspotutk", { domain: "awardco.com" }))
-    : window.fpaData.hsu_id;
+  window.fpaData.hsu_id =
+    Cookies.get("hubspotutk", { domain: DOMAIN }) || window.fpaData.hsu_id;
 
   // TODO: LATER: Populate Wf Attribute (When we have a strategy ready)
 
