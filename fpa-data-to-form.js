@@ -1,3 +1,4 @@
+console.log("FPA TO FORM V1.0.0");
 var Webflow = Webflow || [];
 Webflow.push(function () {
   document.querySelectorAll("[hs-form]").forEach((form) => {
@@ -26,6 +27,7 @@ Webflow.push(function () {
     };
 
     Object.keys(fpaDataMapToFormField).forEach((key) => {
+      console.log(key, fpaDataMapToFormField);
       $(form).find(`[hs-form-field="${key}"]`).val(fpaDataMapToFormField[key]);
     });
   });
