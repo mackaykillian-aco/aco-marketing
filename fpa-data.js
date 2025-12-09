@@ -1,4 +1,4 @@
-console.log("FPA V1.3.6");
+console.log("FPA V1.3.7");
 
 const DEBUG = true;
 function debugLog(message) {
@@ -237,19 +237,18 @@ function updatePageviewData() {
 wf.ready(function () {
   // Initialize LS Item
   initFpaDataLsItem();
-  window.onload = function () {
-    // Read LS Item
-    const itemValue = JSON.parse(localStorage.getItem("_fpa_data")); // Read LS Item and store in global variable
-    window.fpaData = itemValue;
-    debugLog("LS Item READ complete");
 
-    // Update Global Variable fpaData
-    updateUserLevelData();
-    updateSessionLevelData();
-    populateAttrValues();
-    populateAdsValues();
-    updatePageviewData();
-  };
+  // Read LS Item
+  const itemValue = JSON.parse(localStorage.getItem("_fpa_data")); // Read LS Item and store in global variable
+  window.fpaData = itemValue;
+  debugLog("LS Item READ complete");
+
+  // Update Global Variable fpaData
+  updateUserLevelData();
+  updateSessionLevelData();
+  populateAttrValues();
+  populateAdsValues();
+  updatePageviewData();
 
   // Dispath event to signal form is ready to be populated with FPA Data
   const fpaDataReadyEvent = new Event("fpaDataReady");
