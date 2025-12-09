@@ -1,5 +1,6 @@
-console.log("FPA V1.3.7");
+console.log("FPA V1.3.8");
 
+const fpaDataReadyEvent = new Event("fpaDataReady");
 const DEBUG = true;
 function debugLog(message) {
   if (DEBUG) {
@@ -251,7 +252,6 @@ wf.ready(function () {
   updatePageviewData();
 
   // Dispath event to signal form is ready to be populated with FPA Data
-  const fpaDataReadyEvent = new Event("fpaDataReady");
   window.dispatchEvent(fpaDataReadyEvent);
 
   // Write LS Item
