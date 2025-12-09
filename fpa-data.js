@@ -25,11 +25,12 @@ var fpaDataTemplate = {
       sid: "", // Session ID
       pgc: 0, // Page count
       sst: 0, // Session start time
-      tsos: "", // Time spent on site
+      tsos: "", // Time spent on site // set timeout
       ldp: "", // Landing page (session entry point)
       cpv: "", // Current Page View (can be used for Conversion page on form submit)
       ref: "", // Referring URL
       attr: {
+        // TODO: Decide if it's first-touch or last touch
         src: "", // UTM Source
         med: "", // UTM Medium
         cmp: "", // UTM Campaign
@@ -39,11 +40,11 @@ var fpaDataTemplate = {
       },
       ads: {
         // TODO: Adjust Names to match the URL Paramter Name
-        gcl_id: "", // GCLID (Google Ads)
-        dcl_id: "", // DCLID (Doubleclick Ads)
-        msft_id: "", // Microsoft Ads ID
-        lnkd_id: "", // LinkedIn Ads ID
-        meta_id: "", // Meta Ads ID
+        gclid: "", // GCLID (Google Ads)
+        // dcl_id: "", // DCLID (Doubleclick Ads)
+        msclkid: "", // Microsoft Ads ID
+        li_fat_id: "", // LinkedIn Ads ID
+        fbclid: "", // Meta Ads ID
       },
       pvs: [
         {
@@ -180,19 +181,22 @@ function populateAdsValues() {
   var urlParams = new URLSearchParams(queryString);
 
   // TODO: Adjust Names to match the URL Paramter Name (Once Confirmed)
-  window.fpaData.ses[0].ads.gcl_id =
-    window.fpaData.ses[0].ads.gcl_id || urlParams.get("gclid");
-  window.fpaData.ses[0].ads.dcl_id =
-    window.fpaData.ses[0].ads.dcl_id || urlParams.get("dclid");
-  window.fpaData.ses[0].ads.msft_id =
-    window.fpaData.ses[0].ads.msft_id || urlParams.get("msclkid");
-  window.fpaData.ses[0].ads.lnkd_id =
-    window.fpaData.ses[0].ads.lnkd_id || urlParams.get("linkd"); // TODO: Confirm with Paul all Param Names
-  window.fpaData.ses[0].ads.meta_id =
-    window.fpaData.ses[0].ads.meta_id || urlParams.get("fbclid");
+  window.fpaData.ses[0].ads.gclid =
+    window.fpaData.ses[0].ads.gclid || urlParams.get("gclid");
+  // window.fpaData.ses[0].ads.dcl_id =
+  //   window.fpaData.ses[0].ads.dcl_id || urlParams.get("dclid");
+  window.fpaData.ses[0].ads.msclkid =
+    window.fpaData.ses[0].ads.msclkid || urlParams.get("msclkid");
+  window.fpaData.ses[0].ads.li_fat_id =
+    window.fpaData.ses[0].ads.li_fat_id || urlParams.get("li_fat_id"); // TODO: Confirm with Paul all Param Names
+  window.fpaData.ses[0].ads.fbclid =
+    window.fpaData.ses[0].ads.fbclid || urlParams.get("fbclid");
 
   debugLog("populateAdsValues() ->");
 }
+
+// TODO: 2.3 (If UTMs are empty, populate UTM values from from GA Data etc)
+// Only for first-touch of Session
 
 // 3. Update PAGEVIEW Level Data
 function updatePageviewData() {
