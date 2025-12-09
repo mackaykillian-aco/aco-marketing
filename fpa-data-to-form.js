@@ -1,6 +1,8 @@
-console.log("FPA TO FORM V1.0.0");
+console.log("FPA TO FORM V1.0.1");
 var Webflow = Webflow || [];
 Webflow.push(function () {
+  console.log(window.fpaData);
+
   document.querySelectorAll("[hs-form]").forEach((form) => {
     let fpaDataMapToFormField = {
       gclid: window.fpaData?.ses[0].ads.gclid || "",
@@ -27,7 +29,7 @@ Webflow.push(function () {
     };
 
     Object.keys(fpaDataMapToFormField).forEach((key) => {
-      console.log(key, fpaDataMapToFormField);
+      console.log(key, fpaDataMapToFormField[key]);
       $(form).find(`[hs-form-field="${key}"]`).val(fpaDataMapToFormField[key]);
     });
   });
