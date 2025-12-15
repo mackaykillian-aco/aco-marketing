@@ -1,4 +1,4 @@
-console.log("FPA V1.3.8");
+console.log("FPA V1.4.0");
 
 const fpaDataReadyEvent = new Event("fpaDataReady");
 const DEBUG = true;
