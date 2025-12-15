@@ -13,6 +13,46 @@ debugLog("Domain set to: " + DOMAIN);
 const MAX_SESSIONS = 5;
 const MAX_PAGEVIEWS = 25;
 
+// /(\.|\/)(google|bing|yahoo|baidu|yandex|duckduckgo|ecosia|startpage|ask|seznam|naver)\.(com|net|org|co\.[a-z]{2}|com\.[a-z]{2})\//gm
+const SEARCH_ENGINE_REGEX =
+  "/(\\.|\\/)(google|bing|yahoo|baidu|yandex|duckduckgo|ecosia|startpage|ask|seznam|naver)\\.(com|net|org|co\\.[a-z]{2}|com\\.[a-z]{2})\\//gm";
+const SEARCH_ENGINE_DOMAINS = [
+  "google",
+  "bing",
+  "yahoo",
+  "baidu",
+  "yandex",
+  "duckduckgo",
+  "ecosia",
+  "startpage",
+  "ask",
+  "seznam",
+  "naver",
+];
+
+// /(\.|\/)(facebook|instagram|youtube|linkedin|pinterest|reddit|tiktok|tumblr|quora|vimeo|twitch|medium|discord|snapchat|whatsapp|twitter|x)\.(com|net|org|co\.[a-z]{2}|com\.[a-z]{2})/gm
+const SOCIAL_MEDIA_REGEX =
+  "/(\\.|\\/)(facebook|instagram|youtube|linkedin|pinterest|reddit|tiktok|tumblr|quora|vimeo|twitch|medium|discord|snapchat|whatsapp|twitter|x)\\.(com|net|org|co\\.[a-z]{2}|com\\.[a-z]{2})/gm";
+const SOCIAL_MEDIA_DOMAINS = [
+  "facebook",
+  "instagram",
+  "youtube",
+  "linkedin",
+  "pinterest",
+  "reddit",
+  "tiktok",
+  "tumblr",
+  "quora",
+  "vimeo",
+  "twitch",
+  "medium",
+  "discord",
+  "snapchat",
+  "whatsapp",
+  "twitter",
+  "x",
+];
+
 /*** DEFINE MODEL ***/
 var fpaDataTemplate = {
   cid: "",
