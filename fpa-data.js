@@ -1,7 +1,7 @@
-console.log("FPA V1.4.2");
+console.log("FPA V2.0.0");
 
 const fpaDataReadyEvent = new Event("fpaDataReady");
-const DEBUG = true;
+const DEBUG = false;
 function debugLog(message) {
   if (DEBUG) {
     console.log(message);
@@ -162,7 +162,8 @@ function updateUserLevelData() {
   // TODO: if ses is more than 5 items long, remove the oldest session object.
   if (window.fpaData.lact) {
     const sessionExpired =
-      Date.now() - window.fpaData.lact > 24 * 60 * 60 * 1000;
+      // Date.now() - window.fpaData.lact > 24 * 60 * 60 * 1000;
+      Date.now() - window.fpaData.lact > 60 * 60 * 1000;
 
     if (sessionExpired) {
       window.fpaData.ses.unshift(structuredClone(fpaDataTemplate.ses[0]));
