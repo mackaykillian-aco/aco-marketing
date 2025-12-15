@@ -1,4 +1,4 @@
-console.log("FPA V1.4.0");
+console.log("FPA V1.4.2");
 
 const fpaDataReadyEvent = new Event("fpaDataReady");
 const DEBUG = true;
@@ -15,7 +15,7 @@ const MAX_PAGEVIEWS = 25;
 
 // /(\.|\/)(google|bing|yahoo|baidu|yandex|duckduckgo|ecosia|startpage|ask|seznam|naver)\.(com|net|org|co\.[a-z]{2}|com\.[a-z]{2})\//gm
 const SEARCH_ENGINE_REGEX =
-  "/(\\.|\\/)(google|bing|yahoo|baidu|yandex|duckduckgo|ecosia|startpage|ask|seznam|naver)\\.(com|net|org|co\\.[a-z]{2}|com\\.[a-z]{2})\\//gm";
+  /(\.|\/)(google|bing|yahoo|baidu|yandex|duckduckgo|ecosia|startpage|ask|seznam|naver)\.(com|net|org|co\.[a-z]{2}|com\.[a-z]{2})\//gm;
 const SEARCH_ENGINE_DOMAINS = [
   "google",
   "bing",
@@ -32,7 +32,7 @@ const SEARCH_ENGINE_DOMAINS = [
 
 // /(\.|\/)(facebook|instagram|youtube|linkedin|pinterest|reddit|tiktok|tumblr|quora|vimeo|twitch|medium|discord|snapchat|whatsapp|twitter|x)\.(com|net|org|co\.[a-z]{2}|com\.[a-z]{2})/gm
 const SOCIAL_MEDIA_REGEX =
-  "/(\\.|\\/)(facebook|instagram|youtube|linkedin|pinterest|reddit|tiktok|tumblr|quora|vimeo|twitch|medium|discord|snapchat|whatsapp|twitter|x)\\.(com|net|org|co\\.[a-z]{2}|com\\.[a-z]{2})/gm";
+  /(\.|\/)(facebook|instagram|youtube|linkedin|pinterest|reddit|tiktok|tumblr|quora|vimeo|twitch|medium|discord|snapchat|whatsapp|twitter|x)\.(com|net|org|co\.[a-z]{2}|com\.[a-z]{2})/gm;
 const SOCIAL_MEDIA_DOMAINS = [
   "facebook",
   "instagram",
@@ -215,7 +215,41 @@ function populateAttrValues() {
   debugLog("populateAttrValues() ->");
 }
 
-// 2.2 Populate ADS Values
+// 2.2 (If UTMs are empty, populate UTM values from from document.referrer etc)
+// Only for first-touch of Session
+function checkChannelAttribution() {
+  debugLog("-> checkChannelAttribution()");
+
+  if (window.fpaData.ses[0].pvs.length > 1) {
+    return; // Only run on first pageview of session
+  }
+
+  if (document.referrer === "") {
+    window.fpaData.ses[0].attr.med = window.fpaData.ses[0].attr.med || "direct";
+  } else if (SEARCH_ENGINE_REGEX.test(document.referrer)) {
+    window.fpaData.ses[0].attr.med =
+      window.fpaData.ses[0].attr.med || "organic-search";
+
+    window.fpaData.ses[0].attr.src =
+      window.fpaData.ses[0].attr.src || document.referrer;
+  } else if (SOCIAL_MEDIA_REGEX.test(document.referrer)) {
+    window.fpaData.ses[0].attr.med =
+      window.fpaData.ses[0].attr.med || "organic-social";
+
+    window.fpaData.ses[0].attr.src =
+      window.fpaData.ses[0].attr.src || document.referrer;
+  } else {
+    window.fpaData.ses[0].attr.med =
+      window.fpaData.ses[0].attr.med || "web-referral";
+
+    window.fpaData.ses[0].attr.src =
+      window.fpaData.ses[0].attr.src || document.referrer;
+  }
+
+  debugLog("checkChannelAttribution() ->");
+}
+
+// 2.3 Populate ADS Values
 function populateAdsValues() {
   debugLog("-> populateAdsValues()");
   var queryString = window.location.search;
@@ -235,9 +269,6 @@ function populateAdsValues() {
 
   debugLog("populateAdsValues() ->");
 }
-
-// TODO: 2.3 (If UTMs are empty, populate UTM values from from GA Data etc)
-// Only for first-touch of Session
 
 // 3. Update PAGEVIEW Level Data
 function updatePageviewData() {
@@ -288,6 +319,7 @@ wf.ready(function () {
   updateUserLevelData();
   updateSessionLevelData();
   populateAttrValues();
+  checkChannelAttribution();
   populateAdsValues();
   updatePageviewData();
 
