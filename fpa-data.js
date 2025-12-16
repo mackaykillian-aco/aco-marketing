@@ -1,4 +1,4 @@
-console.log("FPA V2.0.2");
+console.log("FPA V2.1.0");
 
 const fpaDataReadyEvent = new Event("fpaDataReady");
 const DEBUG = false;
@@ -199,6 +199,10 @@ function populateAttrValues() {
   debugLog("-> populateAttrValues()");
   var queryString = window.location.search;
   var urlParams = new URLSearchParams(queryString);
+
+  if (window.fpaData.ses[0].pvs.length > 1) {
+    return; // Only run on first pageview of session
+  }
 
   window.fpaData.ses[0].attr.src =
     window.fpaData.ses[0].attr.src || urlParams.get("utm_source");
