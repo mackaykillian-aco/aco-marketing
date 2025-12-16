@@ -1,4 +1,4 @@
-console.log("FPA V2.0.1");
+console.log("FPA V2.0.2");
 
 const fpaDataReadyEvent = new Event("fpaDataReady");
 const DEBUG = false;
@@ -71,7 +71,6 @@ var fpaDataTemplate = {
       cpv: "", // Current Page View (can be used for Conversion page on form submit)
       ref: "", // Referring URL
       attr: {
-        // TODO: Decide if it's first-touch or last touch
         src: "", // UTM Source
         med: "", // UTM Medium
         cmp: "", // UTM Campaign
@@ -80,7 +79,7 @@ var fpaDataTemplate = {
         cnt: "", // UTM Content
       },
       ads: {
-        // TODO: Adjust Names to match the URL Paramter Name
+        // TODO: Ask paul if more paramters are needed
         gclid: "", // GCLID (Google Ads)
         // dcl_id: "", // DCLID (Doubleclick Ads)
         msclkid: "", // Microsoft Ads ID
@@ -163,7 +162,7 @@ function updateUserLevelData() {
   if (window.fpaData.lact) {
     const sessionExpired =
       // Date.now() - window.fpaData.lact > 24 * 60 * 60 * 1000;
-      Date.now() - window.fpaData.lact > 5 * 60 * 1000;
+      Date.now() - window.fpaData.lact > 2 * 60 * 1000;
 
     if (sessionExpired) {
       window.fpaData.ses.unshift(structuredClone(fpaDataTemplate.ses[0]));
@@ -187,6 +186,7 @@ function updateSessionLevelData() {
     window.fpaData.ses[0].sst = Date.now();
     window.fpaData.ses[0].ldp =
       window.fpaData.ses[0].ldp || window.location.pathname;
+    window.fpaData.ses[0].ref = window.fpaData.ses[0].ref || document.referrer;
   }
 
   window.fpaData.ses[0].cpv = window.location.pathname;
