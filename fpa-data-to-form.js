@@ -1,4 +1,4 @@
-console.log("FPA -> FORM V1.2.1");
+console.log("FPA -> FORM V1.2.2");
 
 // PRODUCTION CODE
 // var Webflow = Webflow || [];
@@ -60,7 +60,11 @@ function populateFormFieldsFromFpaData() {
       referring_url: window.fpaData?.ses[0].ref || "",
       landing_page: window.fpaData?.ses[0].ldp || "",
       converting_url: window.fpaData?.ses[0].cpv || "",
-      demo_referrer: window.fpaData?.ses[0].pvs[1].path || "",
+      demo_referrer:
+        window.fpaData?.ses[0].pvs.length > 1
+          ? window.fpaData?.ses[0].pvs[1].path
+          : "",
+      fpa_data: JSON.stringify(window.fpaData || { error: "no fpaData" }),
       webflow_form_id: form.getAttribute("name") || "",
       hubspot_form_id: form.getAttribute("hs-form") || "", // TODO: Keep this
       // variant_id: window.fpaData?.ses[0].pvs[0].expt.vid || "",
