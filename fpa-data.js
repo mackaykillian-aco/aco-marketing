@@ -1,4 +1,4 @@
-console.log("FPA V2.1.0");
+console.log("FPA V2.1.1");
 
 const fpaDataReadyEvent = new Event("fpaDataReady");
 const DEBUG = false;
@@ -29,6 +29,8 @@ const SEARCH_ENGINE_DOMAINS = [
   "seznam",
   "naver",
 ];
+
+// ChatGPT, Gemini Referring logic
 
 // /(\.|\/)(facebook|instagram|youtube|linkedin|pinterest|reddit|tiktok|tumblr|quora|vimeo|twitch|medium|discord|snapchat|whatsapp|twitter|x)\.(com|net|org|co\.[a-z]{2}|com\.[a-z]{2})/gm
 const SOCIAL_MEDIA_REGEX =
@@ -162,7 +164,7 @@ function updateUserLevelData() {
   if (window.fpaData.lact) {
     const sessionExpired =
       // Date.now() - window.fpaData.lact > 24 * 60 * 60 * 1000;
-      Date.now() - window.fpaData.lact > 2 * 60 * 1000;
+      Date.now() - window.fpaData.lact > 10 * 60 * 1000;
 
     if (sessionExpired) {
       window.fpaData.ses.unshift(structuredClone(fpaDataTemplate.ses[0]));
