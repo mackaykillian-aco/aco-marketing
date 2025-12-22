@@ -184,7 +184,7 @@ function updateUserLevelData() {
   if (window.fpaData.lact) {
     const sessionExpired =
       // Date.now() - window.fpaData.lact > 24 * 60 * 60 * 1000;
-      Date.now() - window.fpaData.lact > 10 * 60 * 1000;
+      Date.now() - window.fpaData.lact > 5 * 60 * 1000;
 
     if (sessionExpired) {
       window.fpaData.ses.unshift(structuredClone(fpaDataTemplate.ses[0]));
