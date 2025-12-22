@@ -1,4 +1,4 @@
-console.log("FPA V3.0.0");
+console.log("FPA V3.0.1");
 
 const DEBUG = false;
 function debugLog(message) {
@@ -199,6 +199,9 @@ function updateUserLevelData() {
       debugLog("old sessions removed to maintain max sessions");
     }
   }
+
+  // Update last activity time to be used for next session expiration check
+  window.fpaData.lact = Date.now();
 
   debugLog("updateUserLevelData() ->");
 }
