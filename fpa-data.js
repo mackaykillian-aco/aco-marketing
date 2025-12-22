@@ -1,4 +1,4 @@
-console.log("FPA V2.1.1");
+console.log("FPA V2.2.0");
 
 const fpaDataReadyEvent = new Event("fpaDataReady");
 const DEBUG = false;
@@ -13,35 +13,46 @@ debugLog("Domain set to: " + DOMAIN);
 const MAX_SESSIONS = 5;
 const MAX_PAGEVIEWS = 25;
 
-// /(\.|\/)(google|bing|yahoo|baidu|yandex|duckduckgo|ecosia|startpage|ask|seznam|naver)\.(com|net|org|co\.[a-z]{2}|com\.[a-z]{2})\//gm
+// AI engine referring logic
+const AI_ENGINE_REGEX =
+  /(\.|\/)(chatgpt|gemini.google|perplexity|claude|copilot.microsoft)\.(com|net|org|ai|co\.[a-z]{2}|com\.[a-z]{2})\//gm;
+const AI_ENGINE_DOMAINS = [
+  "chatgpt",
+  "gemini",
+  "perplexity",
+  "claude",
+  "copilot",
+];
+
+// Search engine referring logic
 const SEARCH_ENGINE_REGEX =
   /(\.|\/)(google|bing|yahoo|baidu|yandex|duckduckgo|ecosia|startpage|ask|seznam|naver)\.(com|net|org|co\.[a-z]{2}|com\.[a-z]{2})\//gm;
 const SEARCH_ENGINE_DOMAINS = [
   "google",
   "bing",
   "yahoo",
-  "baidu",
-  "yandex",
   "duckduckgo",
   "ecosia",
+  "yandex",
+  "baidu",
   "startpage",
   "ask",
   "seznam",
   "naver",
 ];
 
-// ChatGPT, Gemini Referring logic
-
-// /(\.|\/)(facebook|instagram|youtube|linkedin|pinterest|reddit|tiktok|tumblr|quora|vimeo|twitch|medium|discord|snapchat|whatsapp|twitter|x)\.(com|net|org|co\.[a-z]{2}|com\.[a-z]{2})/gm
+// Social media referring logic
 const SOCIAL_MEDIA_REGEX =
-  /(\.|\/)(facebook|instagram|youtube|linkedin|pinterest|reddit|tiktok|tumblr|quora|vimeo|twitch|medium|discord|snapchat|whatsapp|twitter|x)\.(com|net|org|co\.[a-z]{2}|com\.[a-z]{2})/gm;
+  /(\.|\/)(facebook|instagram|youtube|linkedin|pinterest|reddit|tiktok|tumblr|quora|vimeo|twitch|medium|discord|snapchat|whatsapp|twitter|x|substack)\.(com|net|org|co\.[a-z]{2}|com\.[a-z]{2})/gm;
 const SOCIAL_MEDIA_DOMAINS = [
+  "linkedin",
   "facebook",
   "instagram",
-  "youtube",
-  "linkedin",
-  "pinterest",
   "reddit",
+  "twitter",
+  "x",
+  "youtube",
+  "pinterest",
   "tiktok",
   "tumblr",
   "quora",
@@ -51,8 +62,7 @@ const SOCIAL_MEDIA_DOMAINS = [
   "discord",
   "snapchat",
   "whatsapp",
-  "twitter",
-  "x",
+  "substack",
 ];
 
 /*** DEFINE MODEL ***/
@@ -130,6 +140,16 @@ function getObectSizeKB(obj) {
     console.error("Error serializing or measuring object size:", e);
     return null;
   }
+}
+
+function extractDomain(referrerUrl, domainList) {
+  if (!referrerUrl) return null;
+  domainList.forEach((domain) => {
+    if (url.includes(domain)) {
+      return domain;
+    }
+    return null;
+  });
 }
 
 /*** INITIALIZE LS ITEM ***/
@@ -233,18 +253,27 @@ function checkChannelAttribution() {
 
   if (document.referrer === "") {
     window.fpaData.ses[0].attr.med = window.fpaData.ses[0].attr.med || "direct";
+  } else if (AI_ENGINE_REGEX.test(document.referrer)) {
+    window.fpaData.ses[0].attr.med =
+      window.fpaData.ses[0].attr.med || "organic-ai";
+
+    window.fpaData.ses[0].attr.src =
+      window.fpaData.ses[0].attr.src ||
+      extractDomain(document.referrer, AI_ENGINE_DOMAINS);
   } else if (SEARCH_ENGINE_REGEX.test(document.referrer)) {
     window.fpaData.ses[0].attr.med =
       window.fpaData.ses[0].attr.med || "organic-search";
 
     window.fpaData.ses[0].attr.src =
-      window.fpaData.ses[0].attr.src || document.referrer;
+      window.fpaData.ses[0].attr.src ||
+      extractDomain(document.referrer, SEARCH_ENGINE_DOMAINS);
   } else if (SOCIAL_MEDIA_REGEX.test(document.referrer)) {
     window.fpaData.ses[0].attr.med =
       window.fpaData.ses[0].attr.med || "organic-social";
 
     window.fpaData.ses[0].attr.src =
-      window.fpaData.ses[0].attr.src || document.referrer;
+      window.fpaData.ses[0].attr.src ||
+      extractDomain(document.referrer, SOCIAL_MEDIA_DOMAINS);
   } else {
     window.fpaData.ses[0].attr.med =
       window.fpaData.ses[0].attr.med || "web-referral";
