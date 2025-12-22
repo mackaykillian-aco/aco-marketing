@@ -1,7 +1,6 @@
-console.log("FPA V2.3.3");
+console.log("FPA V3.0.0");
 
-const fpaDataReadyEvent = new Event("fpaDataReady");
-const DEBUG = true;
+const DEBUG = false;
 function debugLog(message) {
   if (DEBUG) {
     console.log(message);
@@ -255,7 +254,7 @@ function checkChannelAttribution() {
     return; // Only run on first pageview of session
   }
 
-  // TODO: IF the utm gets poplated with just keyword, content, term, or campaign,
+  // QUESTIONS: IF the utm gets poplated with just keyword, content, term, or campaign,
   // do we want src and med to stay empty? or put value in from the checkChannelAttribution()
 
   if (document.referrer === "") {
@@ -351,23 +350,44 @@ function updatePageviewData() {
   debugLog("updatePageviewData() ->");
 }
 
-// function storeWebflowOptimizeData() {
-//   debugLog("-> storeWebflowOptimizeData()");
-//   // Record Webflow Optimize Experiment and Variation Data if available
-//   wf.onVariationRecorded(function (result) {
-//     console.log("Webflow Optimize Experiment ID:", result.experienceId);
-//     console.log("Webflow Optimize Variation ID:", result.variationId);
-//   });
-//   debugLog("storeWebflowOptimizeData() ->");
-// }
+// 4. Logic for Populating Form Fields with FPA Data
+// NOTE: This is tight coupling, but we want to ensure that population happens after FPA Data is ready.
+function populateFormFieldsFromFpaData() {
+  document.querySelectorAll("[hs-form]").forEach((form) => {
+    let fpaDataMapToFormField = {
+      gclid: window.fpaData?.ses[0].ads.gclid || "",
+      ga_client_id: window.fpaData?.ga_cid || "",
+      hsuid: window.fpaData?.hsu_id || "",
+      microsoft_clid: window.fpaData?.ses[0].ads.msclkid || "",
+      linkedin_id: window.fpaData?.ses[0].ads.li_fat_id || "",
+      meta_click_id: window.fpaData?.ses[0].ads.fbclid || "",
+      utm_source: window.fpaData?.ses[0].attr.src || "",
+      utm_medium: window.fpaData?.ses[0].attr.med || "",
+      utm_campaign: window.fpaData?.ses[0].attr.cmp || "",
+      utm_term: window.fpaData?.ses[0].attr.trm || "",
+      utm_content: window.fpaData?.ses[0].attr.cnt || "",
+      utm_keyword: window.fpaData?.ses[0].attr.kwd || "",
+      referring_url: window.fpaData?.ses[0].ref || "",
+      landing_page: window.fpaData?.ses[0].ldp || "",
+      converting_url: window.fpaData?.ses[0].cpv || "",
+      demo_referrer: document.referrer, // previous page URL
+      fpa_data: JSON.stringify(window.fpaData || { error: "no fpaData" }),
+      webflow_form_id: form.getAttribute("name") || "",
+      hubspot_form_id: form.getAttribute("hs-form") || "",
+    };
+
+    Object.keys(fpaDataMapToFormField).forEach((key) => {
+      console.log(key, fpaDataMapToFormField[key]);
+      $(form).find(`[hs-form-field="${key}"]`).val(fpaDataMapToFormField[key]);
+    });
+  });
+}
 
 /*****
  *** MAIN EXECUTION FLOW ***
  *****/
 
 wf.ready(function () {
-  // storeWebflowOptimizeData();
-
   // Initialize LS Item
   initFpaDataLsItem();
 
@@ -384,8 +404,10 @@ wf.ready(function () {
   populateAdsValues();
   updatePageviewData();
 
-  // Dispath event to signal form is ready to be populated with FPA Data
-  window.dispatchEvent(fpaDataReadyEvent);
+  // SEND: Populate Form Fields with FPA Data (Wait for everything to load))
+  window.onload = function () {
+    populateFormFieldsFromFpaData();
+  };
 
   // Write LS Item
   window.addEventListener("beforeunload", function () {
