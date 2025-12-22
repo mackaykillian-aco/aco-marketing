@@ -1,4 +1,4 @@
-console.log("FPA V2.2.0");
+console.log("FPA V2.2.1");
 
 const fpaDataReadyEvent = new Event("fpaDataReady");
 const DEBUG = false;
@@ -250,6 +250,9 @@ function checkChannelAttribution() {
   if (window.fpaData.ses[0].pvs.length > 1) {
     return; // Only run on first pageview of session
   }
+
+  // TODO: IF the utm gets poplated with just keyword, content, term, or campaign,
+  // do we want src and med to stay empty? or put value in from the checkChannelAttribution()
 
   if (document.referrer === "") {
     window.fpaData.ses[0].attr.med = window.fpaData.ses[0].attr.med || "direct";
