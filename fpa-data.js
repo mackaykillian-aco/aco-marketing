@@ -1,4 +1,4 @@
-console.log("FPA V2.2.3");
+console.log("FPA V2.2.4");
 
 const fpaDataReadyEvent = new Event("fpaDataReady");
 const DEBUG = true;
@@ -144,16 +144,13 @@ function getObectSizeKB(obj) {
 
 function extractDomain(referrerUrl, domainList) {
   if (!referrerUrl) return null;
-  let extractedDomain = domainList.forEach((domain) => {
-    if (referrerUrl.includes(domain)) {
-      debugLog(
-        "Referring URL contains: " + domain + " type is: " + typeof domain
-      );
-      return domain;
+  for (i = 0; i < domainList.length; i++) {
+    if (referrerUrl.includes(domainList[i])) {
+      debugLog("Referring URL contains: " + domainList[i]);
+      return domainList[i];
     }
-    return null;
-  });
-  return extractedDomain;
+  }
+  return null;
 }
 
 /*** INITIALIZE LS ITEM ***/
