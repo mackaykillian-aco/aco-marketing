@@ -1,4 +1,4 @@
-console.log("FPA V2.3.1");
+console.log("FPA V2.3.2");
 
 const fpaDataReadyEvent = new Event("fpaDataReady");
 const DEBUG = true;
@@ -103,13 +103,15 @@ var fpaDataTemplate = {
           path: "", // Page path
           top: "", // Time on page
           pvst: 0, // Pageview start time
-          expt: {
-            eid: "", // Webflow Optimize Experiment ID
-            ena: "", // Webflow Optimize Experiment Name
-            etp: "", // Webflow Optimize Experiment Type
-            vid: "", // Webflow Optimize Variant ID
-            vna: "", // Webflow Optimize Variant Name
-          },
+          expt: [
+            {
+              eid: "", // Webflow Optimize Experiment ID
+              ena: "", // Webflow Optimize Experiment Name
+              etp: "", // Webflow Optimize Experiment Type
+              vid: "", // Webflow Optimize Variant ID
+              vna: "", // Webflow Optimize Variant Name
+            },
+          ],
         },
       ],
     },
@@ -317,18 +319,21 @@ function updatePageviewData() {
   let newPageview = structuredClone(fpaDataTemplate.ses[0].pvs[0]);
   newPageview.path = window.location.pathname;
   newPageview.pvst = Date.now();
+  newPageview.expt = []; // Initialize expt as an array
 
   // Record Webflow Optimize Experiment and Variation Data if available
   // TODO: Troubleshoot why this isn't working as expected.
   wf.onVariationRecorded(function (result) {
     console.log("Webflow Optimize Experiment ID:", result.experienceId);
     console.log("Webflow Optimize Variation ID:", result.variationId);
-
-    newPageview.expt.eid = result.experienceId || ""; // Webflow Optimize Experiment ID
-    newPageview.expt.ena = result.experienceName || ""; // Webflow Optimize Experiment Name
-    newPageview.expt.etp = result.experienceType || ""; // Webflow Optimize Experiment Type
-    newPageview.expt.vid = result.variationId || ""; // Webflow Optimize Variant ID
-    newPageview.expt.vna = result.variationName || ""; // Webflow Optimize Variant Name
+    let exptData = {
+      eid: result.experienceId || "", // Webflow Optimize Experiment ID
+      ena: result.experienceName || "", // Webflow Optimize Experiment Name
+      etp: result.experienceType || "", // Webflow Optimize Experiment Type
+      vid: result.variationId || "", // Webflow Optimize Variant ID
+      vna: result.variationName || "", // Webflow Optimize Variant Name
+    };
+    newPageview.expt.push(exptData);
   });
 
   if (!window.fpaData.ses[0].pvs[0].path) {
