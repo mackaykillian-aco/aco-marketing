@@ -185,7 +185,7 @@ function updateUserLevelData() {
   if (window.fpaData.lact) {
     const sessionExpired =
       // Date.now() - window.fpaData.lact > 24 * 60 * 60 * 1000;
-      Date.now() - window.fpaData.lact > 5 * 60 * 1000;
+      Date.now() - window.fpaData.lact > 2 * 60 * 1000;
 
     if (sessionExpired) {
       window.fpaData.ses.unshift(structuredClone(fpaDataTemplate.ses[0]));
@@ -369,7 +369,6 @@ wf.ready(function () {
   // Write LS Item
   window.addEventListener("beforeunload", function () {
     // Time on Session, Time on Pageiew, and Last activity Record here
-    window.fpaData.lact = Date.now();
     window.fpaData.ses[0].tsos = millisToMinutesAndSeconds(
       Date.now() - window.fpaData.ses[0].sst
     );
