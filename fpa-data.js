@@ -1,4 +1,4 @@
-console.log("FPA V2.2.5");
+console.log("FPA V2.3.0");
 
 const fpaDataReadyEvent = new Event("fpaDataReady");
 const DEBUG = true;
@@ -342,11 +342,23 @@ function updatePageviewData() {
   debugLog("updatePageviewData() ->");
 }
 
+function storeWebflowOptimizeData() {
+  debugLog("-> storeWebflowOptimizeData()");
+  // Record Webflow Optimize Experiment and Variation Data if available
+  wf.onVariationRecorded(function (result) {
+    console.log("Webflow Optimize Experiment ID:", result.experienceId);
+    console.log("Webflow Optimize Variation ID:", result.variationId);
+  });
+  debugLog("storeWebflowOptimizeData() ->");
+}
+
 /*****
  *** MAIN EXECUTION FLOW ***
  *****/
 
 wf.ready(function () {
+  storeWebflowOptimizeData();
+
   // Initialize LS Item
   initFpaDataLsItem();
 
