@@ -1,4 +1,4 @@
-console.log("FPA V2.3.2");
+console.log("FPA V2.3.3");
 
 const fpaDataReadyEvent = new Event("fpaDataReady");
 const DEBUG = true;
@@ -181,6 +181,7 @@ function updateUserLevelData() {
     Cookies.get("hubspotutk", { domain: DOMAIN }) || window.fpaData.hsu_id;
 
   // TODO: LATER: Populate Wf Attribute (When we have a strategy ready)
+  window.fpaData.wf_attr = wf.getAllAttributes("user");
 
   // If last session is 24+ hours old, create new session object and push to ses array.
   // TODO: if ses is more than 5 items long, remove the oldest session object.
