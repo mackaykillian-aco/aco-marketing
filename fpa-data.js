@@ -1,7 +1,7 @@
-console.log("FPA V2.2.1");
+console.log("FPA V2.2.2");
 
 const fpaDataReadyEvent = new Event("fpaDataReady");
-const DEBUG = false;
+const DEBUG = true;
 function debugLog(message) {
   if (DEBUG) {
     console.log(message);
@@ -145,7 +145,8 @@ function getObectSizeKB(obj) {
 function extractDomain(referrerUrl, domainList) {
   if (!referrerUrl) return null;
   domainList.forEach((domain) => {
-    if (url.includes(domain)) {
+    if (referrerUrl.includes(domain)) {
+      debugLog("Referring URL contains: " + domain);
       return domain;
     }
     return null;
