@@ -1,4 +1,4 @@
-console.log("FPA V2.3.0");
+console.log("FPA V2.3.1");
 
 const fpaDataReadyEvent = new Event("fpaDataReady");
 const DEBUG = true;
@@ -321,6 +321,9 @@ function updatePageviewData() {
   // Record Webflow Optimize Experiment and Variation Data if available
   // TODO: Troubleshoot why this isn't working as expected.
   wf.onVariationRecorded(function (result) {
+    console.log("Webflow Optimize Experiment ID:", result.experienceId);
+    console.log("Webflow Optimize Variation ID:", result.variationId);
+
     newPageview.expt.eid = result.experienceId || ""; // Webflow Optimize Experiment ID
     newPageview.expt.ena = result.experienceName || ""; // Webflow Optimize Experiment Name
     newPageview.expt.etp = result.experienceType || ""; // Webflow Optimize Experiment Type
@@ -342,22 +345,22 @@ function updatePageviewData() {
   debugLog("updatePageviewData() ->");
 }
 
-function storeWebflowOptimizeData() {
-  debugLog("-> storeWebflowOptimizeData()");
-  // Record Webflow Optimize Experiment and Variation Data if available
-  wf.onVariationRecorded(function (result) {
-    console.log("Webflow Optimize Experiment ID:", result.experienceId);
-    console.log("Webflow Optimize Variation ID:", result.variationId);
-  });
-  debugLog("storeWebflowOptimizeData() ->");
-}
+// function storeWebflowOptimizeData() {
+//   debugLog("-> storeWebflowOptimizeData()");
+//   // Record Webflow Optimize Experiment and Variation Data if available
+//   wf.onVariationRecorded(function (result) {
+//     console.log("Webflow Optimize Experiment ID:", result.experienceId);
+//     console.log("Webflow Optimize Variation ID:", result.variationId);
+//   });
+//   debugLog("storeWebflowOptimizeData() ->");
+// }
 
 /*****
  *** MAIN EXECUTION FLOW ***
  *****/
 
 wf.ready(function () {
-  storeWebflowOptimizeData();
+  // storeWebflowOptimizeData();
 
   // Initialize LS Item
   initFpaDataLsItem();
@@ -394,5 +397,6 @@ wf.ready(function () {
     debugLog("LS Item WRITE complete");
 
     // TODO: LATER: Consider using navigator.sendBeacon() for more reliable data sending. Send to Airtable?
+    // TODO: Add 'visibilityChange' listener for writing on tab switch away, and reading on tab back.
   });
 });
