@@ -370,10 +370,11 @@ wf.ready(function () {
   window.addEventListener("beforeunload", function () {
     // Time on Session, Time on Pageiew, and Last activity Record here
     window.fpaData.ses[0].tsos = millisToMinutesAndSeconds(
-      Date.now() - window.fpaData.ses[0].sst
+      Math.min(Date.now() - window.fpaData.ses[0].sst, 60 * 60 * 1000) //Cap at 60 minutes
     );
+
     window.fpaData.ses[0].pvs[0].top = millisToMinutesAndSeconds(
-      Date.now() - window.fpaData.ses[0].pvs[0].pvst
+      Math.min(Date.now() - window.fpaData.ses[0].pvs[0].pvst, 60 * 60 * 1000) //Cap at 60 minutes
     );
 
     // Write LS Item on page unload
