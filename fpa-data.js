@@ -1,6 +1,6 @@
-console.log("FPA V3.0.2");
+console.log("FPA V3.0.3");
 
-const DEBUG = false;
+const DEBUG = true;
 function debugLog(message) {
   if (DEBUG) {
     console.log(message);
@@ -356,6 +356,7 @@ function updatePageviewData() {
 // 4. Logic for Populating Form Fields with FPA Data
 // NOTE: This is tight coupling, but we want to ensure that population happens after FPA Data is ready.
 function populateFormFieldsFromFpaData() {
+  debugLog("-> populateFormFieldsFromFpaData()");
   document.querySelectorAll("[hs-form]").forEach((form) => {
     let fpaDataMapToFormField = {
       gclid: window.fpaData?.ses[0].ads.gclid || "",
@@ -384,6 +385,7 @@ function populateFormFieldsFromFpaData() {
       $(form).find(`[hs-form-field="${key}"]`).val(fpaDataMapToFormField[key]);
     });
   });
+  debugLog("populateFormFieldsFromFpaData() -> ");
 }
 
 /*****
