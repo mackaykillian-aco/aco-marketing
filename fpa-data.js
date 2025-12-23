@@ -1,4 +1,4 @@
-console.log("FPA V3.0.6");
+console.log("FPA V3.0.8");
 
 const DEBUG = false;
 function debugLog(message) {
@@ -185,9 +185,7 @@ function updateUserLevelData() {
   // If last session is 24+ hours old, create new session object and push to ses array.
   // TODO: if ses is more than 5 items long, remove the oldest session object.
   if (window.fpaData.lact) {
-    const sessionExpired =
-      // Date.now() - window.fpaData.lact > 24 * 60 * 60 * 1000;
-      Date.now() - window.fpaData.lact > 2 * 60 * 1000;
+    const sessionExpired = Date.now() - window.fpaData.lact > 5 * 60 * 1000;
 
     if (sessionExpired) {
       window.fpaData.ses.unshift(structuredClone(fpaDataTemplate.ses[0]));
@@ -429,6 +427,6 @@ wf.ready(function () {
 });
 
 // SEND: Populate Form Fields with FPA Data (Wait for everything to load))
-setTimeout(() => {
-  populateFormFieldsFromFpaData();
-}, 1000);
+// setTimeout(() => {
+//   populateFormFieldsFromFpaData();
+// }, 1000);
