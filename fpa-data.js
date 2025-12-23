@@ -1,4 +1,4 @@
-console.log("FPA V3.0.1");
+console.log("FPA V3.0.2");
 
 const DEBUG = false;
 function debugLog(message) {
@@ -408,9 +408,9 @@ wf.ready(function () {
   updatePageviewData();
 
   // SEND: Populate Form Fields with FPA Data (Wait for everything to load))
-  window.onload = function () {
+  document.addEventListener("DOMContentLoaded", () => {
     populateFormFieldsFromFpaData();
-  };
+  });
 
   // Write LS Item
   window.addEventListener("beforeunload", function () {
