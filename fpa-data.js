@@ -1,4 +1,4 @@
-console.log("FPA V3.0.4");
+console.log("FPA V3.0.5");
 
 const DEBUG = true;
 function debugLog(message) {
@@ -325,10 +325,9 @@ function updatePageviewData() {
   newPageview.expt = []; // Initialize expt as an array
 
   // Record Webflow Optimize Experiment and Variation Data if available
-  // TODO: Troubleshoot why this isn't working as expected.
   wf.onVariationRecorded(function (result) {
-    console.log("Webflow Optimize Experiment ID:", result.experienceId);
-    console.log("Webflow Optimize Variation ID:", result.variationId);
+    debugLog("Webflow Optimize Experiment ID: " + result.experienceId);
+    debugLog("Webflow Optimize Variation ID: " + result.variationId);
     let exptData = {
       eid: result.experienceId || "", // Webflow Optimize Experiment ID
       ena: result.experienceName || "", // Webflow Optimize Experiment Name
@@ -381,7 +380,7 @@ function populateFormFieldsFromFpaData() {
     };
 
     Object.keys(fpaDataMapToFormField).forEach((key) => {
-      console.log(key, fpaDataMapToFormField[key]);
+      debugLog(key + " " + fpaDataMapToFormField[key]);
       $(form).find(`[hs-form-field="${key}"]`).val(fpaDataMapToFormField[key]);
     });
   });
