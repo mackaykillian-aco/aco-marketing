@@ -1,4 +1,4 @@
-console.log("FPA V3.0.8");
+console.log("FPA V3.0.9");
 
 const DEBUG = false;
 function debugLog(message) {
@@ -226,7 +226,7 @@ function populateAttrValues() {
   var queryString = window.location.search;
   var urlParams = new URLSearchParams(queryString);
 
-  if (window.fpaData.ses[0].pvs.length > 1) {
+  if (window.fpaData.ses[0].pvs[0].path) {
     return; // Only run on first pageview of session
   }
 
@@ -251,8 +251,8 @@ function populateAttrValues() {
 function checkChannelAttribution() {
   debugLog("-> checkChannelAttribution()");
 
-  if (window.fpaData.ses[0].pvs.length > 1) {
-    return; // Only run on first pageview of session
+  if (window.fpaData.ses[0].pvs[0].path) {
+    return; // Only run on first pageview of session, if first pageview has path it's not first pageview
   }
 
   // QUESTIONS: IF the utm gets poplated with just keyword, content, term, or campaign,
