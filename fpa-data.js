@@ -1,4 +1,4 @@
-console.log("FPA V3.0.3");
+console.log("FPA V3.0.4");
 
 const DEBUG = true;
 function debugLog(message) {
@@ -409,11 +409,6 @@ wf.ready(function () {
   populateAdsValues();
   updatePageviewData();
 
-  // SEND: Populate Form Fields with FPA Data (Wait for everything to load))
-  document.addEventListener("DOMContentLoaded", () => {
-    populateFormFieldsFromFpaData();
-  });
-
   // Write LS Item
   window.addEventListener("beforeunload", function () {
     // Time on Session, Time on Pageiew, and Last activity Record here
@@ -433,3 +428,8 @@ wf.ready(function () {
     // TODO: Add 'visibilityChange' listener for writing on tab switch away, and reading on tab back.
   });
 });
+
+// SEND: Populate Form Fields with FPA Data (Wait for everything to load))
+setTimeout(() => {
+  populateFormFieldsFromFpaData();
+}, 1000);
