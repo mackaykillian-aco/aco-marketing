@@ -1,6 +1,6 @@
-console.log("FPA V3.0.5");
+console.log("FPA V3.0.6");
 
-const DEBUG = true;
+const DEBUG = false;
 function debugLog(message) {
   if (DEBUG) {
     console.log(message);
