@@ -1,4 +1,4 @@
-console.log("FPA V3.0.9");
+console.log("FPA V3.1.0");
 
 const DEBUG = false;
 function debugLog(message) {
@@ -362,12 +362,12 @@ function populateFormFieldsFromFpaData() {
       microsoft_clid: window.fpaData?.ses[0].ads.msclkid || "",
       linkedin_id: window.fpaData?.ses[0].ads.li_fat_id || "",
       meta_click_id: window.fpaData?.ses[0].ads.fbclid || "",
-      utm_source: window.fpaData?.ses[0].attr.src || "",
-      utm_medium: window.fpaData?.ses[0].attr.med || "",
-      utm_campaign: window.fpaData?.ses[0].attr.cmp || "",
-      utm_term: window.fpaData?.ses[0].attr.trm || "",
-      utm_content: window.fpaData?.ses[0].attr.cnt || "",
-      utm_keyword: window.fpaData?.ses[0].attr.kwd || "",
+      utm_source: window.fpaData?.ses[0].attr.src || "–",
+      utm_medium: window.fpaData?.ses[0].attr.med || "–",
+      utm_campaign: window.fpaData?.ses[0].attr.cmp || "–",
+      utm_term: window.fpaData?.ses[0].attr.trm || "–",
+      utm_content: window.fpaData?.ses[0].attr.cnt || "–",
+      utm_keyword: window.fpaData?.ses[0].attr.kwd || "–",
       referring_url: window.fpaData?.ses[0].ref || "",
       landing_page: window.fpaData?.ses[0].ldp || "",
       converting_url: window.fpaData?.ses[0].cpv || "",
